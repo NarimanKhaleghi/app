@@ -1,718 +1,1038 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>وام‌یار | سوپر اپلیکیشن مالی</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="manifest" href="manifest.json">
-    <style>
-        /* style.css - همه استایل‌ها یکپارچه */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Vazirmatn', sans-serif;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>سوپر اپ اعتباری — MVP</title>
 
-        @font-face {
-            font-family: 'Vazirmatn';
-            src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css') format('woff2');
-            font-weight: 100 900;
-            font-style: normal;
-        }
+  <!-- Modern Persian font (Vazirmatn) from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-        body {
-            background: radial-gradient(circle at 20% 30%, #1a2a4f, #0b0f1c);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px;
-        }
+  <meta name="theme-color" content="#f6f8fb" />
+  <style>
+    :root{
+      --bg:#e9f1fb;
+      --glass-bg: rgba(255,255,255,0.12);
+      --glass-2: rgba(255,255,255,0.07);
+      --accent:#4f8cff;
+      --accent-2:#7b61ff;
+      --muted:#9aa6bd;
+      --text:#0f1724;
+      --danger:#ff5b6e;
+      --success:#2fcc71;
+      --shadow: 0 8px 30px rgba(16,24,40,0.09);
+      --glass-border: rgba(255,255,255,0.3);
+      --glass-blur: 14px;
+    }
 
-        #app {
-            width: 100%;
-            max-width: 380px;
-            height: 700px;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 48px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
+    /* Mobile-first layout */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Vazirmatn", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(127,90,255,0.06), transparent 6%),
+        radial-gradient(900px 400px at 90% 90%, rgba(79,140,255,0.04), transparent 6%),
+        linear-gradient(180deg,#f6f9ff 0%, #eef6ff 100%);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow:hidden;
+      padding-bottom:84px; /* space for bottom nav */
+    }
 
-        /* main content area */
-        .main-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px 16px 80px 16px;
-            scroll-behavior: smooth;
-            direction: rtl;
-        }
+    /* App shell */
+    .app{
+      max-width:420px;
+      margin:12px auto;
+      height:calc(100vh - 24px);
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      position:relative;
+      padding:14px;
+    }
 
-        /* hide all tabs initially, show active */
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
+    /* Top header */
+    header.app-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px;
+      border-radius:16px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06));
+      backdrop-filter: blur(8px);
+      box-shadow:var(--shadow);
+      border: 1px solid rgba(255,255,255,0.4);
+      align-self:stretch;
+    }
 
-        .tab-content.active {
-            display: block;
-        }
+    header .title{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    header h1{font-size:16px;margin:0;font-weight:600}
+    header p{margin:0;font-size:12px;color:var(--muted)}
 
-        @keyframes fadeIn {
-            from { opacity: 0.5; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    /* Main content area: pages as sections */
+    .pages{
+      flex:1;
+      position:relative;
+      overflow:auto;
+      padding-right:6px;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:thin;
+      scrollbar-color: rgba(0,0,0,0.12) transparent;
+    }
 
-        /* bottom navbar */
-        .bottom-nav {
-            position: sticky;
-            bottom: 0;
-            background: rgba(10, 15, 30, 0.7);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 8px 4px;
-            border-radius: 40px 40px 0 0;
-            box-shadow: 0 -10px 30px -10px rgba(0,0,0,0.5);
-            z-index: 10;
-        }
+    /* custom scrollbar */
+    .pages::-webkit-scrollbar{width:8px}
+    .pages::-webkit-scrollbar-thumb{background:rgba(16,24,40,0.06);border-radius:8px}
+    .pages-section{
+      position:absolute;
+      inset:0;
+      padding:12px 12px 96px 12px;
+      transition: transform 420ms cubic-bezier(.2,.9,.3,1), opacity 300ms ease;
+      transform-origin:center center;
+      opacity:0;
+      pointer-events:none;
+    }
+    .pages-section.active{
+      opacity:1;
+      pointer-events:auto;
+      transform:translateX(0) scale(1);
+      z-index:2;
+    }
+    .pages-section.left{
+      transform:translateX(-30%) scale(.98);
+    }
+    .pages-section.right{
+      transform:translateX(30%) scale(.98);
+    }
 
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255,255,255,0.6);
-            font-size: 11px;
-            gap: 4px;
-            transition: all 0.2s;
-            border-radius: 30px;
-            padding: 6px 10px;
-            min-width: 50px;
-            cursor: pointer;
-            border: none;
-            background: transparent;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-        }
+    /* Cards and glass style */
+    .card{
+      border-radius:14px;
+      padding:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+      border:1px solid rgba(255,255,255,0.25);
+      backdrop-filter: blur(var(--glass-blur));
+      box-shadow: 0 6px 20px rgba(16,24,40,0.06);
+      transition: transform 220ms cubic-bezier(.2,.9,.3,1), box-shadow 220ms;
+    }
+    .card:active, .card:focus-within{transform:translateY(4px) scale(.998); box-shadow: 0 10px 30px rgba(16,24,40,0.12)}
 
-        .nav-item i {
-            font-size: 20px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-        }
+    /* Marketplace */
+    .market-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+    }
+    .product{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      overflow:hidden;
+      position:relative;
+    }
+    .product .media{
+      height:110px;
+      border-radius:10px;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg, rgba(127,90,255,0.12), rgba(79,140,255,0.08));
+    }
+    .product img{width:100%;height:100%;object-fit:cover}
+    .product h3{margin:0;font-size:13px}
+    .price-row{display:flex;justify-content:space-between;align-items:center;gap:6px}
+    .price-col{display:flex;flex-direction:column}
+    .cash{font-size:12px;color:var(--muted)}
+    .installment{font-weight:600;font-size:14px;color:var(--accent)}
 
-        .nav-item.active {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            box-shadow: 0 4px 12px rgba(0, 180, 255, 0.3), inset 0 0 0 1px rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
+    .btn{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      justify-content:center;
+      padding:8px 12px;
+      border-radius:10px;
+      font-weight:600;
+      border:none;
+      cursor:pointer;
+      transition:transform .15s ease, box-shadow .15s;
+    }
+    .btn:active{transform:translateY(2px)}
+    .btn-primary{
+      background:linear-gradient(90deg,var(--accent),var(--accent-2));
+      color:white;
+      box-shadow: 0 8px 28px rgba(79,140,255,0.18);
+    }
+    .btn-ghost{
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.12);
+      color:var(--text);
+    }
 
-        .nav-item.ai-item {
-            background: linear-gradient(145deg, #2a6df4, #9f4cf4);
-            color: white;
-            padding: 8px 14px;
-            border-radius: 40px;
-            box-shadow: 0 8px 20px rgba(90, 70, 250, 0.5);
-            transform: scale(1.1);
-            margin-top: -10px;
-        }
+    /* Wallet */
+    .wallet-top{
+      display:flex;gap:12px;align-items:center;justify-content:space-between;
+    }
+    .balance{
+      font-size:20px;font-weight:700;
+      background:linear-gradient(90deg,#2b6cff,#7b61ff);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    .cards-list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+    .bank-card{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:12px;border-radius:12px;
+      background:linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.06);
+    }
+    .card-meta{display:flex;flex-direction:column;gap:6px}
+    .chip{width:34px;height:22px;border-radius:3px;background:linear-gradient(90deg,#ffe3b3,#ffd1a8)}
 
-        .nav-item.ai-item i {
-            font-size: 26px;
-        }
+    /* Credits listing */
+    .loan-list{display:flex;flex-direction:column;gap:10px}
+    .loan-card{display:flex;gap:10px;align-items:center;justify-content:space-between}
+    .loan-left{display:flex;gap:10px;align-items:center}
+    .bank-logo{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+    .bank-info{display:flex;flex-direction:column}
+    .loan-meta{font-size:12px;color:var(--muted)}
 
-        .nav-item.ai-item span {
-            font-size: 10px;
-            font-weight bold;
-        }
+    /* AI Chat UI */
+    .chat{
+      display:flex;flex-direction:column;height:100%;
+      gap:12px;
+    }
+    .chat-window{
+      flex:1; overflow:auto; padding:12px; display:flex;flex-direction:column;gap:10px;
+      border-radius:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.06);
+    }
+    .bubble{max-width:78%;padding:10px 12px;border-radius:12px;font-size:13px;line-height:1.35}
+    .bubble.user{align-self:flex-start;background:linear-gradient(90deg,#f3f7ff,#eef6ff);border:1px solid rgba(79,140,255,0.06)}
+    .bubble.ai{align-self:flex-end;background:linear-gradient(90deg,#4f8cff,#7b61ff);color:white}
 
-        /* glass card */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: 28px;
-            padding: 18px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255,255,255,0.1);
-            margin-bottom: 18px;
-        }
+    .quick-q{display:flex;gap:8px;flex-wrap:wrap}
+    .chip-q{padding:8px 10px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.05);cursor:pointer}
 
-        .gradient-text {
-            background: linear-gradient(135deg, #ffffff, #c5d9ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 700;
-        }
+    /* Payments */
+    .qr-mock{display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px;border-radius:16px}
+    .qr-box{width:160px;height:160px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.04));display:flex;align-items:center;justify-content:center}
+    .summary-row{display:flex;justify-content:space-between;gap:10px;align-items:center}
 
-        h2 {
-            font-size: 20px;
-            margin-bottom: 16px;
-            color: white;
-            font-weight: 600;
-            letter-spacing: -0.5px;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
+    /* Accounting */
+    .tabs{display:flex;gap:8px;overflow:auto;padding-bottom:8px}
+    .tab{padding:8px 12px;border-radius:999px;background:transparent;border:1px solid rgba(255,255,255,0.03);cursor:pointer}
+    .tab.active{background:linear-gradient(90deg,#eaf2ff,#f4f7ff);border:1px solid rgba(79,140,255,0.09);font-weight:700}
 
-        h3 {
-            font-size: 16px;
-            color: rgba(255,255,255,0.9);
-            margin-bottom: 8px;
-        }
+    .txn{display:flex;justify-content:space-between;gap:8px;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);align-items:center}
 
-        /* scroll horizontal */
-        .scroll-horizontal {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding: 4px 0 16px 0;
-            scrollbar-width: none;
-        }
+    /* Profile */
+    .profile-top{display:flex;gap:12px;align-items:center}
+    .avatar{width:64px;height:64px;border-radius:16px;background:linear-gradient(90deg,#7b61ff,#4f8cff);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px}
 
-        .scroll-horizontal::-webkit-scrollbar {
-            display: none;
-        }
+    /* Bottom nav */
+    .bottom-nav{
+      position:fixed;left:50%;transform:translateX(-50%);bottom:12px;
+      width:calc(100% - 36px);max-width:460px;height:64px;border-radius:999px;display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+      border:1px solid rgba(255,255,255,0.3);backdrop-filter: blur(10px);box-shadow:0 18px 40px rgba(16,24,40,0.08);
+      padding:8px 12px;gap:6px;
+    }
+    .nav-item{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 8px;border-radius:10px;cursor:pointer;color:var(--muted);font-size:12px}
+    .nav-item.active{color:var(--accent);background:linear-gradient(90deg, rgba(79,140,255,0.06), rgba(127,90,255,0.04));font-weight:700}
+    .nav-item svg{width:22px;height:22px;opacity:0.95}
 
-        .category-chip {
-            background: rgba(255,255,255,0.1);
-            border-radius: 40px;
-            padding: 10px 18px;
-            color: white;
-            font-size: 14px;
-            white-space: nowrap;
-            border: 1px solid rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
-        }
+    /* Floating central AI button */
+    .fab{
+      position:absolute;left:50%;transform:translateX(-50%);top:-28px;width:64px;height:64px;border-radius:20px;
+      display:flex;align-items:center;justify-content:center;z-index:10;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      box-shadow: 0 18px 40px rgba(127,90,255,0.24);
+      border:4px solid rgba(255,255,255,0.12);
+      transition: transform .18s ease;
+    }
+    .fab:active{transform:translateX(-50%) translateY(2px) scale(.98)}
+    .fab svg{width:28px;height:28px;color:white}
 
-        /* store card */
-        .store-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 24px;
-            padding: 16px;
-            min-width: 160px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+    /* responsive adjustments */
+    @media(min-width:700px){
+      .app{margin:18px auto;height:calc(100vh - 36px)}
+      .pages-section{padding:18px 18px 120px 18px}
+      .market-grid{grid-template-columns:repeat(3,1fr)}
+    }
 
-        .btn {
-            background: linear-gradient(145deg, #2d7aff, #21b0fe);
-            border: none;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 14px;
-            box-shadow: 0 8px 20px rgba(0,120,255,0.4);
-            width: 100%;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: none;
-            color: white;
-        }
-
-        /* list items */
-        .list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .list-item:last-child {
-            border-bottom: none;
-        }
-
-        .badge {
-            background: rgba(255,215,0,0.2);
-            border-radius: 30px;
-            padding: 4px 12px;
-            font-size: 12px;
-            color: #ffd966;
-            border: 1px solid rgba(255,215,0,0.4);
-        }
-
-        /* chat bubbles */
-        .chat-bubble-user {
-            background: linear-gradient(145deg, #2a6df4, #9f4cf4);
-            color: white;
-            padding: 14px 18px;
-            border-radius: 28px 28px 4px 28px;
-            max-width: 80%;
-            align-self: flex-end;
-            margin: 8px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .chat-bubble-bot {
-            background: rgba(30, 40, 60, 0.8);
-            backdrop-filter: blur(10px);
-            color: #eef;
-            padding: 14px 18px;
-            border-radius: 28px 28px 28px 4px;
-            max-width: 80%;
-            align-self: flex-start;
-            margin: 8px 0;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .chat-input-area {
-            display: flex;
-            gap: 8px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 60px;
-            padding: 6px;
-            margin-top: 16px;
-        }
-
-        .chat-input-area input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 14px 18px;
-            color: white;
-            font-size: 14px;
-        }
-
-        .chat-input-area input::placeholder {
-            color: rgba(255,255,255,0.5);
-        }
-
-        .chat-input-area button {
-            background: linear-gradient(145deg, #2d7aff, #21b0fe);
-            border: none;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        /* progress bar */
-        .progress-bar {
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-            margin: 12px 0;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #2d7aff, #a55cff);
-            width: 65%;
-            border-radius: 20px;
-        }
-
-        /* stats boxes */
-        .stat-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .stat-box {
-            background: rgba(255,255,255,0.05);
-            border-radius: 24px;
-            padding: 16px;
-            backdrop-filter: blur(10px);
-        }
-
-        /* avatar */
-        .avatar {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, #2a6df4, #9f4cf4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            color: white;
-            margin-bottom: 12px;
-        }
-
-        /* rtl specific */
-        .fa-chevron-left {
-            transform: scaleX(-1);
-        }
-
-        .text-muted {
-            color: rgba(255,255,255,0.5);
-            font-size: 12px;
-        }
-
-        .small {
-            font-size: 12px;
-        }
-
-        .text-white {
-            color: white;
-        }
-
-        .mt-2 {
-            margin-top: 8px;
-        }
-
-        .mb-2 {
-            margin-bottom: 8px;
-        }
-
-        .d-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .gap-2 {
-            gap: 8px;
-        }
-
-        .qr-placeholder {
-            width: 120px;
-            height: 120px;
-            background: repeating-linear-gradient(45deg, #fff 0px, #fff 8px, #333 8px, #333 16px);
-            border-radius: 24px;
-            margin: 0 auto;
-        }
-
-        .install-btn {
-            background: linear-gradient(145deg, #22c55e, #16a34a);
-            margin-top: 20px;
-        }
-    </style>
+    /* small utilities */
+    .muted{color:var(--muted);font-size:12px}
+    .spacer{height:8px}
+    .row{display:flex;align-items:center;gap:8px}
+    .pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.04);font-weight:600;font-size:12px}
+    .badge{background:var(--accent);color:white;padding:6px 8px;border-radius:999px;font-size:12px}
+    .modal-backdrop{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:18px;z-index:40}
+    .modal{width:100%;max-width:420px;border-radius:16px;padding:14px;background:linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.18)}
+  </style>
 </head>
 <body>
-    <div id="app">
-        <!-- main content pages (7 tabs) -->
-        <div class="main-content" id="mainContent">
-            <!-- صفحه فروشگاه -->
-            <div class="tab-content active" id="tab-shop">
-                <div class="glass-card" style="background: linear-gradient(145deg, #2b3b6e, #1b2b55);">
-                    <h1 class="gradient-text" style="font-size: 24px;">خرید اعتباری</h1>
-                    <p style="color: #b0c8ff;">تا ۱۲ قسط بدون ضامن</p>
-                </div>
-                <div class="scroll-horizontal">
-                    <span class="category-chip">الکترونیک</span>
-                    <span class="category-chip">مد و پوشاک</span>
-                    <span class="category-chip">خانه</span>
-                    <span class="category-chip">ورزش</span>
-                    <span class="category-chip">کالای دیجیتال</span>
-                </div>
-                <h2>پیشنهاد ویژه</h2>
-                <div class="scroll-horizontal">
-                    <div class="store-card">
-                        <i class="fas fa-store" style="color: #7aa2ff; font-size: 24px;"></i>
-                        <h3>دیجی‌کالا</h3>
-                        <p>اعتبار ۵ میلیون</p>
-                        <p>کارمزد ۰٪</p>
-                        <p>۴ قسط</p>
-                        <button class="btn" style="padding: 8px;">دریافت اعتبار</button>
-                    </div>
-                    <div class="store-card">
-                        <i class="fas fa-tshirt" style="color: #ff7aa2;"></i>
-                        <h3>مدیسا</h3>
-                        <p>اعتبار ۳ میلیون</p>
-                        <p>کارمزد ۴٪</p>
-                        <p>۳ قسط</p>
-                        <button class="btn" style="padding: 8px;">دریافت اعتبار</button>
-                    </div>
-                </div>
-                <h2>فروشگاه‌های همکار</h2>
-                <div class="glass-card">
-                    <div class="list-item">
-                        <div><i class="fas fa-laptop"></i> فروشگاه آل‌دیجیتال</div>
-                        <div>۲ میلیون <span class="badge">۴ قسط</span></div>
-                    </div>
-                    <div class="list-item">
-                        <div><i class="fas fa-couch"></i> خانه مدرن</div>
-                        <div>۴ میلیون <span class="badge">۶ قسط</span></div>
-                    </div>
-                    <div class="list-item">
-                        <div><i class="fas fa-mobile-alt"></i> موبایل ایران</div>
-                        <div>۷ میلیون <span class="badge">۱۲ قسط</span></div>
-                    </div>
-                </div>
-            </div>
+  <div class="app" role="application" aria-label="اپلیکیشن اعتبار">
+    <header class="app-header card">
+      <div class="title">
+        <!-- small bank-like logo -->
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <rect x="0" y="0" width="24" height="24" rx="6" fill="url(#g)"/>
+          <defs>
+            <linearGradient id="g" x1="0" x2="1">
+              <stop offset="0" stop-color="#7b61ff"/>
+              <stop offset="1" stop-color="#4f8cff"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div>
+          <h1>فالانکredit</h1>
+          <p class="muted">مارکت پلیس تجمیع وام و اعتبار</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="installBtn" class="btn btn-ghost" title="نصب اپ">نصب</button>
+        <button id="notifBtn" class="btn btn-ghost" title="اعلان‌ها">
+          <!-- bell -->
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h11z"></path>
+            <path d="M13.73 21a2 2 0 01-3.46 0"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
 
-            <!-- صفحه اعتبارات -->
-            <div class="tab-content" id="tab-credits">
-                <h2>دریافت اعتبار و وام</h2>
-                <div class="glass-card" style="background: linear-gradient(145deg, #4f46e5, #7c3aed);">
-                    <p style="color: #eee;">✨ پیشنهاد هوشمند</p>
-                    <p style="font-weight: bold;">با توجه به اطلاعات اعتبارسنجی شما، وام ۱۰۰ میلیونی کالانو بانک تجارت با بازپرداخت ۱۲ ماهه آماده است.</p>
-                    <button class="btn" style="margin-top: 12px;">شروع فرآیند دریافت</button>
-                </div>
-                <div class="glass-card">
-                    <div class="list-item">
-                        <div><span style="font-weight: bold;">بانک تجارت</span> - کالانو</div>
-                        <div>۱۰۰م / ۱۲ ماه / ۴٪</div>
-                        <button class="btn-outline btn" style="width: auto; padding: 6px 12px;">جزئیات</button>
-                    </div>
-                    <div class="list-item">
-                        <div><span style="font-weight: bold;">بانک ملت</span> - بهین کارت</div>
-                        <div>۵۰م / ۲۴ ماه / ۶٪</div>
-                        <button class="btn-outline btn" style="width: auto; padding: 6px 12px;">جزئیات</button>
-                    </div>
-                    <div class="list-item">
-                        <div><span style="font-weight: bold;">بانک ملی</span> - مهربانی</div>
-                        <div>۳۰م / ۱۸ ماه / ۰٪</div>
-                        <button class="btn-outline btn" style="width: auto; padding: 6px 12px;">جزئیات</button>
-                    </div>
-                    <div class="list-item">
-                        <div><span style="font-weight: bold;">بلوبانک</span> - وام دیجیتال</div>
-                        <div>۲۰م / ۶ ماه / ۲٪</div>
-                        <button class="btn-outline btn" style="width: auto; padding: 6px 12px;">جزئیات</button>
-                    </div>
-                    <div class="list-item">
-                        <div><span style="font-weight: bold;">تارا</span> - اعتبار خرید</div>
-                        <div>۵م / ۳ قسط / ۰٪</div>
-                        <button class="btn-outline btn" style="width: auto; padding: 6px 12px;">جزئیات</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- صفحه کیف پول -->
-            <div class="tab-content" id="tab-wallet">
-                <h2>کیف پول</h2>
-                <div class="glass-card">
-                    <div class="d-flex">
-                        <span>موجودی کل</span>
-                        <span style="font-size: 28px;">۱۲,۵۰۰,۰۰۰</span>
-                    </div>
-                    <div class="d-flex mt-2">
-                        <span>اعتبار فعال</span>
-                        <span>۸,۲۰۰,۰۰۰</span>
-                    </div>
-                </div>
-                <div class="glass-card" style="background: linear-gradient(145deg, #1e2b4a, #0f1a2f);">
-                    <div class="d-flex">
-                        <span><i class="fab fa-cc-mastercard"></i> کارت ملت</span>
-                        <span>**** ۱۲۳۴</span>
-                    </div>
-                    <div class="d-flex mt-2">
-                        <span><i class="fab fa-cc-visa"></i> کارت ملی</span>
-                        <span>**** ۵۶۷۸</span>
-                    </div>
-                    <button class="btn-outline btn mt-2">+ افزودن کارت جدید</button>
-                </div>
-                <button class="btn">افتتاح حساب جدید</button>
-            </div>
-
-            <!-- صفحه هوش مصنوعی (چت) -->
-            <div class="tab-content" id="tab-ai">
-                <h2>مشاور هوشمند اعتبار</h2>
-                <div class="glass-card" style="display: flex; flex-direction: column; min-height: 400px;">
-                    <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;" id="chatBox">
-                        <div class="chat-bubble-bot">سلام 👋 من دستیار هوشمند وام‌یار هستم. چطور می‌توانم کمک کنم؟</div>
-                        <div class="chat-bubble-user">الان چه وام هایی میتونم بگیرم؟</div>
-                        <div class="chat-bubble-bot">با توجه به اطلاعات اعتبارسنجی شما، وام ۱۰۰ میلیونی کالانو بانک تجارت با بازپرداخت ۱۲ ماهه. مایل هستید آموزش کامل دریافت را ببینید؟</div>
-                    </div>
-                    <div class="scroll-horizontal" style="margin: 10px 0;">
-                        <span class="category-chip" onclick="addUserMessage('الان چه وام هایی میتونم بگیرم؟')">وام‌های موجود</span>
-                        <span class="category-chip" onclick="addUserMessage('الان چه اعتبار هایی میتونم بگیرم؟')">اعتبارهای فعال</span>
-                    </div>
-                    <div class="chat-input-area">
-                        <input type="text" placeholder="سوال خود را بپرسید..." id="chatInput">
-                        <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- صفحه پرداخت -->
-            <div class="tab-content" id="tab-payment">
-                <h2>پرداخت و اقساط</h2>
-                <div class="glass-card" style="text-align: center;">
-                    <div class="qr-placeholder"></div>
-                    <p class="mt-2">اسکن کنید و مبلغ را پرداخت کنید</p>
-                    <div class="d-flex gap-2" style="justify-content: center;">
-                        <span class="badge">۵۰۰,۰۰۰ تومان</span>
-                        <button class="btn" style="width: auto;">اسکن</button>
-                    </div>
-                    <p class="text-muted mt-2">پرداخت با NFC نیز فعال است</p>
-                </div>
-                <h3>مدیریت بدهی‌ها</h3>
-                <div class="glass-card">
-                    <div class="d-flex"><span>کل بدهی</span><span>۱۰,۱۶۶,۰۰۰</span></div>
-                    <div class="d-flex mt-1"><span>قسط بعدی</span><span>۱,۶۶۶,۰۰۰</span></div>
-                    <div class="d-flex mt-1"><span>سررسید</span><span>۲۰ اسفند</span></div>
-                    <div class="progress-bar"><div class="progress-fill"></div></div>
-                    <button class="btn">پرداخت قسط</button>
-                </div>
-                <div class="list-item">
-                    <span>قسط کالانو</span><span>۸,۵۰۰,۰۰۰</span><span class="badge">۲۰ اسفند</span>
-                </div>
-                <div class="list-item">
-                    <span>اعتبار تارا</span><span>۱,۶۶۶,۰۰۰</span><span class="badge">۵ فروردین</span>
-                </div>
-            </div>
-
-            <!-- صفحه حسابداری شخصی -->
-            <div class="tab-content" id="tab-accounting">
-                <h2>داشبورد مالی</h2>
-                <div class="stat-grid">
-                    <div class="stat-box"><span>هزینه</span><br><span style="font-size: 22px;">۲,۹۷۰,۰۰۰</span></div>
-                    <div class="stat-box"><span>درآمد</span><br><span style="font-size: 22px;">۱۷,۰۰۰,۰۰۰</span></div>
-                    <div class="stat-box"><span>دارایی</span><br><span style="font-size: 22px;">۴۲,۵۰۰,۰۰۰</span></div>
-                    <div class="stat-box"><span>بدهی</span><br><span style="font-size: 22px;">۱۰,۱۶۶,۰۰۰</span></div>
-                </div>
-                <div class="glass-card">
-                    <p class="text-muted">نمودار خلاصه ماهانه (نمایشی)</p>
-                    <div style="height: 60px; background: rgba(255,255,255,0.1); border-radius: 20px;"></div>
-                </div>
-                <h3>تراکنش‌ها</h3>
-                <div class="glass-card">
-                    <div class="list-item"><span>🛒 خرید لپ‌تاپ</span><span>-۲,۵۰۰,۰۰۰</span></div>
-                    <div class="list-item"><span>🚖 تاکسی اینترنتی</span><span>-۱۲۰,۰۰۰</span></div>
-                    <div class="list-item"><span>🍔 رستوران</span><span>-۳۵۰,۰۰۰</span></div>
-                    <div class="list-item"><span>💼 حقوق ماهانه</span><span>+۱۵,۰۰۰,۰۰۰</span></div>
-                    <div class="list-item"><span>💻 پروژه فریلنس</span><span>+۲,۰۰۰,۰۰۰</span></div>
-                </div>
-                <div class="glass-card">
-                    <p class="text-muted">📱 این اطلاعات به صورت خودکار از پیامک‌های بانکی شما تحلیل شده است.</p>
-                </div>
-            </div>
-
-            <!-- صفحه حساب کاربری -->
-            <div class="tab-content" id="tab-profile">
-                <div class="glass-card" style="display: flex; flex-direction: column; align-items: center;">
-                    <div class="avatar">ع</div>
-                    <h3>علی رضایی</h3>
-                    <div class="d-flex gap-2">
-                        <span class="badge">سطح اعتبار: نقره‌ای</span>
-                        <span class="badge">امتیاز: ۶۸۰</span>
-                    </div>
-                    <span class="badge" style="background: #22c55e20; color: #4ade80;">احراز هویت شده</span>
-                </div>
-                <div class="glass-card">
-                    <div class="list-item"><i class="fas fa-user"></i> اطلاعات شخصی <i class="fas fa-chevron-left"></i></div>
-                    <div class="list-item"><i class="fas fa-file"></i> مدارک <i class="fas fa-chevron-left"></i></div>
-                    <div class="list-item"><i class="fas fa-cog"></i> تنظیمات <i class="fas fa-chevron-left"></i></div>
-                    <div class="list-item"><i class="fas fa-lock"></i> امنیت <i class="fas fa-chevron-left"></i></div>
-                    <div class="list-item"><i class="fas fa-sign-out-alt"></i> خروج <i class="fas fa-chevron-left"></i></div>
-                </div>
-                <button class="btn install-btn" id="installAppBtn" style="display: none;">📲 نصب اپلیکیشن</button>
-            </div>
+    <main class="pages" id="pages">
+      <!-- Page 1: فروشگاه -->
+      <section id="page-store" class="pages-section active" aria-labelledby="storeTitle">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <h2 id="storeTitle" style="margin:0 0 6px 0">خرید اعتباری</h2>
+            <p class="muted" style="margin:0">محصولات قابل خرید با پرداخت نقد یا اعتبار</p>
+          </div>
+          <div class="pill">پیشنهاد ویژه</div>
         </div>
 
-        <!-- bottom navbar -->
-        <div class="bottom-nav" id="bottomNav">
-            <button class="nav-item active" data-tab="shop"><i class="fas fa-store"></i><span>فروشگاه</span></button>
-            <button class="nav-item" data-tab="credits"><i class="fas fa-hand-holding-usd"></i><span>اعتبارات</span></button>
-            <button class="nav-item" data-tab="wallet"><i class="fas fa-wallet"></i><span>کیف پول</span></button>
-            <button class="nav-item ai-item" data-tab="ai"><i class="fas fa-robot"></i><span>AI</span></button>
-            <button class="nav-item" data-tab="payment"><i class="fas fa-credit-card"></i><span>پرداخت</span></button>
-            <button class="nav-item" data-tab="accounting"><i class="fas fa-chart-pie"></i><span>حسابداری</span></button>
-            <button class="nav-item" data-tab="profile"><i class="fas fa-user-circle"></i><span>حساب</span></button>
+        <div class="spacer"></div>
+
+        <div class="market-grid">
+          <!-- product cards rendered by JS -->
         </div>
-    </div>
 
-    <script>
-        // script.js
-        (function() {
-            // tab switching
-            const tabs = document.querySelectorAll('.nav-item');
-            const contents = document.querySelectorAll('.tab-content');
+        <div class="spacer"></div>
+        <div class="card">
+          <h3 style="margin:0 0 8px 0">تخفیف‌ها و پیشنهادها</h3>
+          <p class="muted" style="margin:0">امروز پیشنهاد ویژه روی کالای الکترونیک تا ۲۰٪ تخفیف هنگام خرید با اعتبار</p>
+        </div>
+      </section>
 
-            function switchTab(tabId) {
-                contents.forEach(c => c.classList.remove('active'));
-                document.getElementById('tab-' + tabId).classList.add('active');
-                tabs.forEach(t => t.classList.remove('active'));
-                document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
-            }
+      <!-- Page 2: کیف پول -->
+      <section id="page-wallet" class="pages-section right" aria-labelledby="walletTitle">
+        <h2 id="walletTitle">کیف پول</h2>
+        <p class="muted">موجودی و کارت‌های بانکی</p>
+        <div class="spacer"></div>
+        <div class="card wallet-top">
+          <div>
+            <div class="muted">موجودی قابل برداشت</div>
+            <div class="balance">۳,۲۵۰,۰۰۰ تومان</div>
+            <div class="muted" style="font-size:12px">آخرین بروزرسانی: ۷ اسفند ۱۴۰۴</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-primary" id="addFunds">افزایش موجودی</button>
+            <button class="btn btn-ghost" id="addCard">افزودن کارت</button>
+          </div>
+        </div>
 
-            tabs.forEach(tab => {
-                tab.addEventListener('click', (e) => {
-                    const tabId = tab.getAttribute('data-tab');
-                    switchTab(tabId);
-                });
-            });
+        <div class="spacer"></div>
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <h3 style="margin:0">کارت‌های بانکی</h3>
+            <div class="muted">۳ کارت فعال</div>
+          </div>
+          <div class="cards-list" id="cardsList">
+            <!-- cards by JS -->
+          </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="card">
+          <h3 style="margin:0 0 8px 0">حساب‌های متصل</h3>
+          <p class="muted" style="margin:0">حساب‌های بانکی متصل به منظور اعتبارسنجی و پرداخت اقساط</p>
+        </div>
+      </section>
 
-            // PWA install
-            let deferredPrompt;
-            const installBtn = document.getElementById('installAppBtn');
+      <!-- Page 3: اعتبارات -->
+      <section id="page-credits" class="pages-section right" aria-labelledby="creditsTitle">
+        <h2 id="creditsTitle">اعتبارات</h2>
+        <p class="muted">مرکز تجمیعی وام‌ها و اعتباردهی</p>
 
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                installBtn.style.display = 'block';
-            });
+        <div class="spacer"></div>
 
-            installBtn.addEventListener('click', async () => {
-                if (!deferredPrompt) return;
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log(outcome);
-                deferredPrompt = null;
-                installBtn.style.display = 'none';
-            });
+        <div class="card" style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="muted">پیشنهاد هوشمند</div>
+              <div style="font-weight:700">بر اساس اعتبارسنجی شما، می‌توانید وام <span style="color:var(--accent)">۱۰۰ میلیون تومانی کالانو بانک تجارت</span> با بازپرداخت ۱۲ ماهه دریافت کنید.</div>
+            </div>
+            <div>
+              <button class="btn btn-primary" id="startLoan">شروع فرآیند دریافت</button>
+            </div>
+          </div>
+        </div>
 
-            // chat simulation
-            window.addUserMessage = function(text) {
-                const chatBox = document.getElementById('chatBox');
-                const userMsg = document.createElement('div');
-                userMsg.className = 'chat-bubble-user';
-                userMsg.innerText = text;
-                chatBox.appendChild(userMsg);
-                chatBox.scrollTop = chatBox.scrollHeight;
+        <div class="spacer"></div>
 
-                // bot response
-                setTimeout(() => {
-                    const botMsg = document.createElement('div');
-                    botMsg.className = 'chat-bubble-bot';
-                    if (text.includes('وام')) {
-                        botMsg.innerText = 'با توجه به اطلاعات اعتبارسنجی شما، وام ۱۰۰ میلیونی کالانو بانک تجارت با بازپرداخت ۱۲ ماهه. مایل هستید آموزش کامل دریافت را ببینید؟';
-                    } else {
-                        botMsg.innerText = 'در حال حاضر می‌توانید از اعتبار ۵ میلیونی تارا استفاده کنید و آن را در ۳ قسط بدون سود بازپرداخت نمایید.';
-                    }
-                    chatBox.appendChild(botMsg);
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                }, 600);
-            };
+        <div class="loan-list" id="loanList">
+          <!-- loan cards by JS -->
+        </div>
+      </section>
 
-            window.sendMessage = function() {
-                const input = document.getElementById('chatInput');
-                if (input.value.trim()) {
-                    addUserMessage(input.value);
-                    input.value = '';
-                }
-            };
+      <!-- Page 4: هوش مصنوعی -->
+      <section id="page-ai" class="pages-section right" aria-labelledby="aiTitle">
+        <h2 id="aiTitle">هوش مصنوعی</h2>
+        <p class="muted">دستیار هوشمند اعتباری (رابط کاربری نمونه)</p>
 
-            // prefill some chat
-            setTimeout(() => {
-                if (document.getElementById('tab-ai').classList.contains('active')) {
-                    // do nothing extra
-                }
-            }, 100);
-        })();
-    </script>
+        <div class="spacer"></div>
 
-    <!-- register service worker -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => console.log('SW registered')).catch(err => console.log('SW error', err));
-            });
+        <div class="chat card" style="height:72vh;min-height:360px">
+          <div class="chat-window" id="chatWindow" aria-live="polite">
+            <!-- sample bubbles -->
+            <div class="bubble user">الان چه وام‌هایی می‌تونم بگیرم؟</div>
+            <div class="bubble ai">با توجه به اطلاعات اعتبارسنجی و بانک‌هایی که از تو دارم، تو الان می‌تونی وام ۱۰۰ میلیونی با بازپرداخت ۱۲ ماهه کالانو بانک تجارت رو دریافت کنی. می‌خوای آموزش کامل فرآیند دریافتش رو برات توضیح بدم؟</div>
+
+            <div class="bubble user">الان چه اعتبارهایی می‌تونم بگیرم؟</div>
+            <div class="bubble ai">با توجه به اطلاعات اعتبارسنجی و حساب‌هایی که از تو دارم، تو الان می‌تونی از اعتبار ۵ میلیونی تارا استفاده کنی و در ۳ قسط بدون سود و کارمزد پرداخت کنی.</div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="quick-q">
+              <div class="chip-q" data-q="چه وام‌هایی؟">الان چه وام‌هایی می‌تونم بگیرم؟</div>
+              <div class="chip-q" data-q="چه اعتبارهایی؟">الان چه اعتبارهایی می‌تونم بگیرم؟</div>
+              <div class="chip-q" data-q="راهنما">راهنمای دریافت وام</div>
+            </div>
+
+            <div style="display:flex;gap:8px">
+              <input id="chatInput" placeholder="متن سوال..." style="flex:1;padding:10px;border-radius:12px;border:1px solid rgba(0,0,0,0.04)" />
+              <button id="sendChat" class="btn btn-primary">ارسال</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page 5: پرداخت -->
+      <section id="page-pay" class="pages-section right" aria-labelledby="payTitle">
+        <h2 id="payTitle">پرداخت</h2>
+        <p class="muted">پرداخت‌های حضوری، NFC و اقساط</p>
+
+        <div class="spacer"></div>
+
+        <div class="card qr-mock">
+          <div class="summary-row" style="width:100%">
+            <div>
+              <div class="muted">مجموع بدهی</div>
+              <div style="font-weight:700">۱۲,۷۵۰,۰۰۰ تومان</div>
+            </div>
+            <div>
+              <div class="muted">نزدیک‌ترین سررسید</div>
+              <div style="font-weight:700">۱۰ اسفند ۱۴۰۴</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px">
+            <div class="qr-box card">
+              <!-- fake QR -->
+              <svg viewBox="0 0 100 100" width="120" height="120">
+                <rect x="6" y="6" width="18" height="18" fill="#0f1724"/>
+                <rect x="6" y="30" width="18" height="18" fill="#0f1724"/>
+                <rect x="30" y="6" width="18" height="18" fill="#0f1724"/>
+                <rect x="54" y="30" width="10" height="10" fill="#0f1724"/>
+                <rect x="70" y="54" width="8" height="8" fill="#0f1724"/>
+                <rect x="30" y="70" width="8" height="8" fill="#0f1724"/>
+                <rect x="50" y="50" width="6" height="6" fill="#0f1724"/>
+              </svg>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start">
+              <button class="btn btn-primary">پرداخت با QR</button>
+              <button class="btn btn-ghost">پرداخت NFC (نمونه)</button>
+              <button class="btn btn-ghost">پرداخت اقساط</button>
+            </div>
+          </div>
+
+          <div style="margin-top:10px;width:100%">
+            <h4 style="margin:6px 0">اقساط باقی‌مانده</h4>
+            <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-weight:700">وام کالانو</div>
+                <div class="muted">بازپرداخت ۱۲ ماهه — قسط بعدی: ۱۰ اسفند</div>
+              </div>
+              <div style="text-align:center">
+                <div class="muted">قسط</div>
+                <div style="font-weight:700">۸,۷۵۰,۰۰۰</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page 6: حسابداری شخصی -->
+      <section id="page-accounting" class="pages-section right" aria-labelledby="accTitle">
+        <h2 id="accTitle">حسابداری شخصی</h2>
+        <p class="muted">کاهش هزینه‌ها و مدیریت درآمد</p>
+
+        <div class="spacer"></div>
+
+        <div class="card">
+          <div class="tabs" role="tablist" aria-label="تب‌ها">
+            <div class="tab active" data-tab="expense">هزینه</div>
+            <div class="tab" data-tab="income">درآمد</div>
+            <div class="tab" data-tab="assets">دارایی</div>
+            <div class="tab" data-tab="debt">بدهی</div>
+          </div>
+
+          <div style="margin-top:10px" id="txnArea">
+            <!-- sample transactions -->
+            <div class="txn">
+              <div>
+                <div style="font-weight:700">خرید سوپرمارکت</div>
+                <div class="muted">۵ اسفند — کارت ملت</div>
+              </div>
+              <div style="text-align:left;color:var(--danger)">- ۳۲۰,۰۰۰</div>
+            </div>
+
+            <div class="txn">
+              <div>
+                <div style="font-weight:700">حقوق ماهانه</div>
+                <div class="muted">۱ اسفند — واریز مستقیم</div>
+              </div>
+              <div style="text-align:left;color:var(--success)">+ ۱۸,۰۰۰,۰۰۰</div>
+            </div>
+          </div>
+
+          <div style="margin-top:10px" class="muted">سیستم به صورت هوشمند پیامک‌های بانکی را تحلیل کرده و تراکنش‌ها را دسته‌بندی می‌کند.</div>
+
+        </div>
+      </section>
+
+      <!-- Page 7: حساب کاربری -->
+      <section id="page-profile" class="pages-section right" aria-labelledby="profileTitle">
+        <h2 id="profileTitle">حساب کاربری</h2>
+        <div class="spacer"></div>
+        <div class="card">
+          <div class="profile-top">
+            <div class="avatar">ن</div>
+            <div>
+              <div style="font-weight:700">نریمان</div>
+              <div class="muted">سطح اعتبار: <strong style="color:var(--accent)">خوب</strong></div>
+              <div class="muted">وضعیت اعتبارسنجی: <strong>تایید شده</strong></div>
+            </div>
+          </div>
+
+          <div class="spacer"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost">تنظیمات</button>
+            <button class="btn btn-ghost">مستندات</button>
+            <button class="btn btn-ghost" id="logoutBtn">خروج</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Page 8: بیشتر/اطلاعیه‌ها -->
+      <section id="page-more" class="pages-section right" aria-labelledby="moreTitle">
+        <h2 id="moreTitle">بیشتر</h2>
+        <p class="muted">ابزارها و اطلاعیه‌ها</p>
+
+        <div class="spacer"></div>
+        <div class="card">
+          <h3 style="margin:0">اطلاعیه‌ها</h3>
+          <div class="muted" style="margin-top:8px">هیچ اطلاعیه جدیدی وجود ندارد.</div>
+        </div>
+
+        <div class="spacer"></div>
+        <div class="card">
+          <h3 style="margin:0">ابزارها</h3>
+          <div style="margin-top:8px" class="muted">محاسبه‌گر اقساط، اعتبارسنجی نمونه و گزارش ریسک</div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- bottom navigation -->
+    <nav class="bottom-nav" role="navigation" aria-label="ناوبری پائین">
+      <div class="fab" id="aiFab" title="هوش مصنوعی (دستیار)">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C9.243 2 7 4.243 7 7v2a5 5 0 005 5v3l3 3" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div style="display:flex;gap:6px;width:100%;align-items:center">
+        <!-- Right to left order -->
+        <div class="nav-item" data-target="page-store" title="فروشگاه">
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 9l1-2h16l1 2v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" stroke="currentColor" stroke-width="1.4"/></svg>
+            <div style="font-size:11px">فروشگاه</div>
+          </div>
+        </div>
+
+        <div class="nav-item" data-target="page-wallet" title="کیف پول">
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.4"/></svg>
+            <div style="font-size:11px">کیف پول</div>
+          </div>
+        </div>
+
+        <div class="nav-item" data-target="page-credits" title="اعتبارات">
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div style="font-size:11px">اعتبارات</div>
+          </div>
+        </div>
+
+        <!-- central FAB placeholder space -->
+        <div style="width:8px"></div>
+
+        <div class="nav-item" data-target="page-pay" title="پرداخت">
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M6 10h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div style="font-size:11px">پرداخت</div>
+          </div>
+        </div>
+
+        <div class="nav-item" data-target="page-accounting" title="حسابداری">
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 21v-6a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v6" stroke="currentColor" stroke-width="1.4"/></svg>
+            <div style="font-size:11px">حسابداری</div>
+          </div>
+        </div>
+
+        <div class="nav-item" data-target="page-profile" title="حساب کاربری">
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="1.4"/></svg>
+            <div style="font-size:11px">حساب کاربری</div>
+          </div>
+        </div>
+
+        <div class="nav-item" data-target="page-more" title="بیشتر">
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg>
+            <div style="font-size:11px">بیشتر</div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <!-- modal container -->
+  <div id="modalRoot" aria-live="polite"></div>
+
+  <script>
+    /* ====== Data (sample) ====== */
+    const PRODUCTS = [
+      {id:1,title:"گوشی هوشمند X1",priceCash:"18,900,000",priceInst:"2,000,000/ماه",instCount:12,img:"https://images.unsplash.com/photo-1510557880182-3a835d0bdc47?auto=format&fit=crop&w=800&q=60"},
+      {id:2,title:"تلویزیون LED 50\"",priceCash:"12,450,000",priceInst:"1,300,000/ماه",instCount:10,img:"https://images.unsplash.com/photo-1581299892620-6f3b9d9f8f0c?auto=format&fit=crop&w=800&q=60"},
+      {id:3,title:"یخچال اسمارت",priceCash:"25,300,000",priceInst:"2,400,000/ماه",instCount:12,img:"https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=800&q=60"},
+      {id:4,title:"لپ‌تاپ حرفه‌ای",priceCash:"58,900,000",priceInst:"5,200,000/ماه",instCount:12,img:"https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=60"},
+      {id:5,title:"ساعت هوشمند",priceCash:"2,100,000",priceInst:"700,000/ماه",instCount:3,img:"https://images.unsplash.com/photo-1512868729877-54b9f8d31f2f?auto=format&fit=crop&w=800&q=60"},
+      {id:6,title:"هدفون بی‌سیم",priceCash:"1,050,000",priceInst:"350,000/ماه",instCount:3,img:"https://images.unsplash.com/photo-1518444023676-55f2b0f6f0ff?auto=format&fit=crop&w=800&q=60"}
+    ];
+
+    const CARDS = [
+      {id:1,bank:"ملت",number:"6037 **** **** 1234",isDefault:true},
+      {id:2,bank:"ملی",number:"6104 **** **** 9876",isDefault:false},
+      {id:3,bank:"سامان",number:"6393 **** **** 4567",isDefault:false}
+    ];
+
+    const LOANS = [
+      {id:1,bank:"بانک تجارت (کالانو)",type:"نقدی/قرض‌الحسنه",max:"100,000,000",terms:"12",fee:"1.8%"},
+      {id:2,bank:"بانک ملت",type:"خرید اقساطی",max:"50,000,000",terms:"6-24",fee:"2.1%"},
+      {id:3,bank:"بانک ملی",type:"وام فوری",max:"30,000,000",terms:"3-12",fee:"2.4%"},
+      {id:4,bank:"تارا",type:"اعتبار خرد",max:"5,000,000",terms:"1-3",fee:"0%"},
+      {id:5,bank:"دیجی‌پی",type:"خرید اقساطی",max:"20,000,000",terms:"6-12",fee:"1.9%"},
+      {id:6,bank:"لندو",type:"وام شخصی",max:"200,000,000",terms:"12-36",fee:"2.5%"},
+    ];
+
+    /* ====== Utilities ====== */
+    const q = s => document.querySelector(s);
+    const qa = s => Array.from(document.querySelectorAll(s));
+
+    /* ====== Render functions ====== */
+    function renderProducts(){
+      const grid = q('.market-grid');
+      grid.innerHTML = '';
+      for(const p of PRODUCTS){
+        const el = document.createElement('div');
+        el.className = 'card product';
+        el.innerHTML = `
+          <div class="media"><img loading="lazy" src="${p.img}" alt="${p.title}"></div>
+          <h3>${p.title}</h3>
+          <div class="price-row">
+            <div class="price-col">
+              <div class="cash">نقد: ${p.priceCash} تومان</div>
+              <div class="installment">${p.priceInst} • ${p.instCount} قسط</div>
+            </div>
+            <div>
+              <button class="btn btn-primary buyBtn" data-id="${p.id}">خرید با اعتبار</button>
+            </div>
+          </div>`;
+        grid.appendChild(el);
+      }
+    }
+
+    function renderCards(){
+      const root = q('#cardsList');
+      root.innerHTML = '';
+      for(const c of CARDS){
+        const el = document.createElement('div');
+        el.className = 'bank-card';
+        el.innerHTML = `
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="chip"></div>
+            <div class="card-meta">
+              <div style="font-weight:700">${c.bank}</div>
+              <div class="muted">${c.number}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            ${c.isDefault?'<div class="badge">پیش‌فرض</div>':''}
+            <button class="btn btn-ghost setDefault" data-id="${c.id}">پیش‌فرض</button>
+            <button class="btn btn-ghost delCard" data-id="${c.id}">حذف</button>
+          </div>
+        `;
+        root.appendChild(el);
+      }
+    }
+
+    function renderLoans(){
+      const root = q('#loanList');
+      root.innerHTML = '';
+      for(const l of LOANS){
+        const el = document.createElement('div');
+        el.className = 'loan-card card';
+        el.innerHTML = `
+          <div class="loan-left">
+            <div class="bank-logo" style="background:linear-gradient(90deg,#${Math.floor(Math.random()*16777215).toString(16)},#${Math.floor(Math.random()*16777215).toString(16)})">${l.bank.split(' ')[0].slice(0,2)}</div>
+            <div class="bank-info">
+              <div style="font-weight:700">${l.bank}</div>
+              <div class="muted">${l.type} — سقف ${l.max} تومان</div>
+            </div>
+          </div>
+          <div style="text-align:left">
+            <div class="muted">اقساط: ${l.terms} ماه</div>
+            <div style="font-weight:700">${l.fee} نرخ کارمزد</div>
+            <div style="margin-top:8px"><button class="btn btn-primary viewLoan" data-id="${l.id}">مشاهده جزئیات</button></div>
+          </div>
+        `;
+        root.appendChild(el);
+      }
+    }
+
+    /* ====== SPA Navigation ====== */
+    const sections = qa('.pages-section');
+    const navItems = qa('.nav-item');
+    function showPage(id){
+      sections.forEach(s=>{
+        if(s.id===id){
+          s.classList.add('active');
+          s.classList.remove('left','right');
+        } else {
+          s.classList.remove('active');
+          // set simple direction heuristics
+          s.classList.add('right');
         }
-    </script>
+      });
+      // set nav active
+      navItems.forEach(n=>{
+        n.classList.toggle('active', n.dataset.target===id);
+      });
+    }
+    // wire nav
+    navItems.forEach(n=>{
+      n.addEventListener('click', ()=> {
+        showPage(n.dataset.target);
+        window.scrollTo({top:0,behavior:'smooth'});
+      });
+    });
+
+    // central FAB leads to AI page
+    q('#aiFab').addEventListener('click', ()=> showPage('page-ai'));
+
+    /* ====== Interactions (cards, wallet) ====== */
+    document.addEventListener('click', (e)=>{
+      if(e.target.matches('.buyBtn')){
+        const id = +e.target.dataset.id;
+        const p = PRODUCTS.find(x=>x.id===id);
+        openModal(`
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <h3 style="margin:0">${p.title}</h3>
+            <div class="muted">قیمت نقد: ${p.priceCash} تومان</div>
+            <div class="muted">اقساط: ${p.instCount} قسط — ${p.priceInst}</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-primary confirmBuy" data-id="${p.id}">تایید خرید با اعتبار</button>
+              <button class="btn btn-ghost closeModal">انصراف</button>
+            </div>
+          </div>
+        `);
+      }
+
+      if(e.target.matches('.delCard')){
+        const id = +e.target.dataset.id;
+        openConfirm('آیا مایل به حذف کارت هستید؟', ()=>{
+          const idx = CARDS.findIndex(c=>c.id===id);
+          if(idx>-1) CARDS.splice(idx,1);
+          renderCards();
+          closeModal();
+        });
+      }
+
+      if(e.target.matches('.setDefault')){
+        const id = +e.target.dataset.id;
+        CARDS.forEach(c=>c.isDefault = (c.id===id));
+        renderCards();
+      }
+
+      if(e.target.matches('.viewLoan')){
+        const id = +e.target.dataset.id;
+        const l = LOANS.find(x=>x.id===id);
+        openModal(`
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <h3 style="margin:0">${l.bank}</h3>
+            <div class="muted">نوع: ${l.type}</div>
+            <div class="muted">حداکثر مبلغ: ${l.max} تومان</div>
+            <div class="muted">مدت بازپرداخت: ${l.terms} ماه</div>
+            <div class="muted">نرخ کارمزد: ${l.fee}</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-primary startLoan" data-id="${l.id}">درخواست</button>
+              <button class="btn btn-ghost closeModal">بستن</button>
+            </div>
+          </div>
+        `);
+      }
+
+      if(e.target.matches('.startLoan')){
+        const id = +e.target.dataset.id;
+        closeModal();
+        // navigate to credits and show a small toast
+        showPage('page-credits');
+        toast('فرآیند درخواست وام آغاز شد — نمونه MVP');
+      }
+
+      if(e.target.matches('.closeModal')){
+        closeModal();
+      }
+    });
+
+    // add card button
+    q('#addCard').addEventListener('click', ()=> {
+      openModal(`
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <h3 style="margin:0">افزودن کارت جدید</h3>
+          <input id="newCardBank" placeholder="نام بانک" style="padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)"/>
+          <input id="newCardNum" placeholder="شماره کارت" style="padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)"/>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" id="saveCardBtn">ذخیره</button>
+            <button class="btn btn-ghost closeModal">انصراف</button>
+          </div>
+        </div>
+      `);
+
+      q('#saveCardBtn').addEventListener('click', ()=>{
+        const bank = q('#newCardBank').value || 'بانک جدید';
+        const num = q('#newCardNum').value || '*** **** ****';
+        CARDS.push({id:Date.now(),bank,number:num,isDefault:false});
+        renderCards();
+        closeModal();
+        toast('کارت اضافه شد');
+      }, {once:true});
+    });
+
+    /* ====== Modal & Toast helpers ====== */
+    function openModal(html){
+      const root = q('#modalRoot');
+      root.innerHTML = `
+        <div class="modal-backdrop">
+          <div class="modal card">${html}</div>
+        </div>
+      `;
+      // close on backdrop click
+      root.querySelector('.modal-backdrop').addEventListener('click', (e)=>{
+        if(e.target.classList.contains('modal-backdrop')) closeModal();
+      });
+    }
+    function closeModal(){
+      q('#modalRoot').innerHTML = '';
+    }
+    function openConfirm(message, onConfirm){
+      openModal(`<div style="display:flex;flex-direction:column;gap:12px"><div>${message}</div><div style="display:flex;gap:8px"><button class="btn btn-primary confirm">تایید</button><button class="btn btn-ghost closeModal">انصراف</button></div></div>`);
+      q('.confirm').addEventListener('click', ()=> { onConfirm(); });
+    }
+
+    function toast(text, ms=2400){
+      const t = document.createElement('div');
+      t.style.position='fixed'; t.style.bottom='96px'; t.style.left='50%'; t.style.transform='translateX(-50%)';
+      t.style.background='linear-gradient(90deg,#1f6cff,#7b61ff)'; t.style.color='white'; t.style.padding='10px 14px';
+      t.style.borderRadius='12px'; t.style.boxShadow='0 12px 30px rgba(16,24,40,0.12)'; t.style.zIndex=60; t.style.fontWeight=700;
+      t.textContent=text;
+      document.body.appendChild(t);
+      setTimeout(()=> t.style.opacity='0', ms-400);
+      setTimeout(()=> t.remove(), ms);
+    }
+
+    /* ====== Chat quick interactions (UI-only) ====== */
+    qa('.chip-q').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const qtxt = el.dataset.q;
+        appendChatMessage(qtxt,'user');
+        if(qtxt.includes('وام')){
+          setTimeout(()=> appendChatMessage('در حال بررسی...<br>پیشنهاد: وام ۱۰۰ میلیون کالانو بانک تجارت، ۱۲ ماهه', 'ai'), 900);
+        } else if(qtxt.includes('اعتبار')){
+          setTimeout(()=> appendChatMessage('شما می‌توانید اعتبار ۵ میلیون تومانی تارا را در ۳ قسط بدون سود استفاده کنید.', 'ai'), 900);
+        } else {
+          setTimeout(()=> appendChatMessage('آموزش دریافت: مراحل اسکن مدارک، تکمیل فرم و تایید اعتبار...', 'ai'), 900);
+        }
+      });
+    });
+
+    q('#sendChat').addEventListener('click', ()=>{
+      const txt = q('#chatInput').value.trim();
+      if(!txt) return;
+      appendChatMessage(txt,'user');
+      q('#chatInput').value='';
+      setTimeout(()=> appendChatMessage('پاسخ نمونه: بر اساس سابقه و تراکنش‌هایتان...', 'ai'), 800);
+    });
+
+    function appendChatMessage(content,who='ai'){
+      const c = document.createElement('div');
+      c.className = 'bubble ' + (who==='user'?'user':'ai');
+      c.innerHTML = content;
+      q('#chatWindow').appendChild(c);
+      q('#chatWindow').scrollTop = q('#chatWindow').scrollHeight + 200;
+    }
+
+    /* ====== Install / PWA mock ====== */
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e)=>{
+      e.preventDefault();
+      deferredPrompt = e;
+      q('#installBtn').style.display = 'inline-flex';
+    });
+
+    q('#installBtn').addEventListener('click', async ()=>{
+      if(deferredPrompt){
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        if(choice.outcome === 'accepted') toast('نصب پذیرفته شد');
+        else toast('نصب رد شد');
+        deferredPrompt = null;
+      } else {
+        // fallback: show a banner/instruction
+        openModal(`<div style="display:flex;flex-direction:column;gap:10px"><h3>نصب اپ</h3><div class="muted">برای افزودن به صفحه اصلی: از منوی مرورگر گزینه "Add to Home screen" را انتخاب کنید.</div><div style="display:flex;gap:8px"><button class="btn btn-ghost closeModal">بستن</button></div></div>`);
+      }
+    });
+
+    /* ====== Create inline manifest and service worker (mock) ====== */
+    (function createManifestAndSW(){
+      try {
+        const manifest = {
+          name: "فالانکredit",
+          short_name: "فالانک",
+          start_url: ".",
+          display: "standalone",
+          background_color:"#f6f9ff",
+          theme_color:"#4f8cff",
+          description:"سوپر اپ تجمیعی وام و اعتبار — MVP",
+          icons:[]
+        };
+        const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = URL.createObjectURL(blob);
+        document.head.appendChild(link);
+      } catch(err){console.warn('manifest err',err)}
+      // create a minimal service worker script as blob and register it (mock offline)
+      if('serviceWorker' in navigator){
+        const swCode = `
+          self.addEventListener('install', evt => {
+            self.skipWaiting();
+          });
+          self.addEventListener('activate', evt => {
+            evt.waitUntil(clients.claim());
+          });
+          self.addEventListener('fetch', evt => {
+            // simple pass-through (no caching heavy yet)
+          });
+        `;
+        const swBlob = new Blob([swCode], {type:'application/javascript'});
+        const swUrl = URL.createObjectURL(swBlob);
+        navigator.serviceWorker.register(swUrl).then(reg=>{
+          console.log('SW registered',reg);
+        }).catch(err=>console.warn('SW failed',err));
+      }
+    })();
+
+    /* ====== Init rendering ====== */
+    renderProducts();
+    renderCards();
+    renderLoans();
+
+    /* default nav highlight */
+    navItems.forEach(n=> {
+      if(n.dataset.target==='page-store') n.classList.add('active');
+    });
+
+    /* small handlers */
+    q('#startLoan').addEventListener('click', ()=> {
+      openModal(`<div style="display:flex;flex-direction:column;gap:10px"><h3>شروع دریافت وام</h3><div class="muted">در این نمونه، فرایند به صورت دموی رابط کاربری اجرا می‌شود.</div><div style="display:flex;gap:8px"><button class="btn btn-primary startLoan" data-id="1">تایید و ادامه</button><button class="btn btn-ghost closeModal">بستن</button></div></div>`);
+    });
+
+    q('#logoutBtn').addEventListener('click', ()=> {
+      openConfirm('آیا می‌خواهید خارج شوید؟', ()=> {
+        toast('شما خارج شدید');
+        closeModal();
+      });
+    });
+
+    // small keyboard hide on mobile when navigation pressed
+    navItems.forEach(n=>{
+      n.addEventListener('touchstart', ()=> document.activeElement && document.activeElement.blur());
+    });
+
+    /* splash like micro-animation when loaded */
+    window.addEventListener('load', ()=> {
+      setTimeout(()=> document.querySelector('.app-header').style.transform='translateY(0)', 300);
+    });
+
+    // Onboarding banner mock (A2HS)
+    setTimeout(()=> {
+      const banner = document.createElement('div');
+      banner.className='card';
+      banner.style.position='fixed'; banner.style.left='12px'; banner.style.right='12px'; banner.style.bottom='104px';
+      banner.style.borderRadius='12px'; banner.style.padding='10px'; banner.style.display='flex'; banner.style.justifyContent='space-between';
+      banner.style.zIndex=55;
+      banner.innerHTML = '<div><strong>افزودن به صفحه اصلی</strong><div class="muted">برای دسترسی سریع‌تر اپ را به صفحه اصلی اضافه کنید.</div></div><div style="display:flex;gap:8px"><button class="btn btn-primary" id="a2hsBtn">افزودن</button><button class="btn btn-ghost" id="a2hsClose">بستن</button></div>';
+      document.body.appendChild(banner);
+      q('#a2hsBtn').addEventListener('click', ()=> { toast('راهنمای افزودن نمایش داده شد'); banner.remove(); });
+      q('#a2hsClose').addEventListener('click', ()=> banner.remove());
+      setTimeout(()=> banner.remove(), 12000);
+    }, 1100);
+
+    /* Small accessibility: keyboard nav for nav items */
+    navItems.forEach(n=>{
+      n.tabIndex = 0;
+      n.addEventListener('keydown', e=> { if(e.key==='Enter') n.click(); });
+    });
+
+    // ensure everything fits GitHub Pages (single-file deploy friendly)
+    console.log('MVP ready — single HTML file PWA mock (UI-only).');
+  </script>
 </body>
 </html>
