@@ -1,779 +1,718 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>سوپر اپلیکیشن اعتبار و مدیریت مالی</title>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <meta name="theme-color" content="#0b1226">
-  <style>
-/* style.css - Embedded: Mobile First, RTL, Glassmorphism, Premium Fintech UI */
-:root{
-  --bg1: linear-gradient(135deg,#081428 0%, #0b1b3a 50%, #07142a 100%);
-  --glass: rgba(255,255,255,0.06);
-  --glass-2: rgba(255,255,255,0.04);
-  --accent1: #6ee7b7;
-  --accent2: #8bd3ff;
-  --accent3: #b98bff;
-  --muted: rgba(255,255,255,0.7);
-  --card-radius: 16px;
-  --shadow: 0 6px 20px rgba(2,6,23,0.6);
-  --glass-border: rgba(255,255,255,0.06);
-  --glass-strong: rgba(255,255,255,0.09);
-  font-family: "Vazirmatn", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>وام‌یار | سوپر اپلیکیشن مالی</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        /* style.css - همه استایل‌ها یکپارچه */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+        }
 
-*{box-sizing:border-box}
-html,body{height:100%}
-body.app{
-  margin:0;
-  min-height:100%;
-  background:var(--bg1);
-  color:#fff;
-  position:relative;
-  -webkit-user-select:none;
-  user-select:none;
-  font-size:14px;
-  overflow:hidden;
-}
+        @font-face {
+            font-family: 'Vazirmatn';
+            src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css') format('woff2');
+            font-weight: 100 900;
+            font-style: normal;
+        }
 
-/* background layered gradients + blur */
-.app-bg{
-  position:fixed;inset:0;
-  background:
-    radial-gradient(60% 40% at 75% 20%, rgba(185,139,255,0.12), transparent 10%),
-    radial-gradient(50% 30% at 20% 80%, rgba(107,211,255,0.06), transparent 12%),
-    linear-gradient(180deg, rgba(11,18,38,0.9) 0%, rgba(3,7,19,0.8) 100%);
-  filter:blur(28px) saturate(110%);
-  z-index:-2;
-}
+        body {
+            background: radial-gradient(circle at 20% 30%, #1a2a4f, #0b0f1c);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
 
-/* Topbar */
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:12px;
-  padding-left:16px;
-  padding-right:16px;
-  position:relative;
-  z-index:40;
-}
-.topbar-title{font-weight:600; font-size:16px}
-.topbar .btn-icon{
-  background:transparent;border:1px solid var(--glass-border);padding:6px 10px;border-radius:12px;color:var(--muted);backdrop-filter:blur(8px);
-}
-.user-badge img{width:38px;border-radius:10px;opacity:0.95}
+        #app {
+            width: 100%;
+            max-width: 380px;
+            height: 700px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 48px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
 
-/* Pages container */
-.pages{
-  padding:12px;
-  padding-bottom:84px; /* nav */
-  height:calc(100vh - 56px);
-  overflow:auto;
-  -webkit-overflow-scrolling:touch;
-}
+        /* main content area */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 16px 80px 16px;
+            scroll-behavior: smooth;
+            direction: rtl;
+        }
 
-/* Glass card base */
-.glass{
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border-radius:var(--card-radius);
-  border:1px solid var(--glass-border);
-  box-shadow:var(--shadow);
-  backdrop-filter: blur(10px) saturate(120%);
-  padding:12px;
-  margin-bottom:14px;
-}
+        /* hide all tabs initially, show active */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
 
-/* Hero */
-.hero{
-  display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;border-radius:20px;background:linear-gradient(135deg,rgba(137,197,255,0.08),rgba(185,139,255,0.06));
-}
-.hero h1{margin:0;font-size:18px}
-.hero .muted{opacity:0.9;color:var(--muted)}
-.cta{background:linear-gradient(90deg,var(--accent1),var(--accent2));border:none;padding:10px 14px;border-radius:14px;color:#041229;font-weight:600;box-shadow:0 6px 18px rgba(106,225,199,0.14);}
+        .tab-content.active {
+            display: block;
+        }
 
-/* sections */
-.section h4{margin:6px 0 8px 0;font-size:15px}
-.section-header{display:flex;justify-content:space-between;align-items:center}
-.link{background:transparent;border:none;color:var(--muted)}
+        @keyframes fadeIn {
+            from { opacity: 0.5; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-/* carousel */
-.carousel{display:flex;gap:12px;overflow:auto;padding-top:8px;padding-bottom:6px}
-.carousel::-webkit-scrollbar{display:none}
-.card{min-width:200px;padding:12px;border-radius:14px}
-.card.promo{width:220px}
-.card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.brand{font-weight:600}
-.limit{font-size:12px;color:var(--muted)}
+        /* bottom navbar */
+        .bottom-nav {
+            position: sticky;
+            bottom: 0;
+            background: rgba(10, 15, 30, 0.7);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 4px;
+            border-radius: 40px 40px 0 0;
+            box-shadow: 0 -10px 30px -10px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
 
-/* chips */
-.chips{display:flex;gap:8px;overflow:auto;padding:8px 0}
-.chips .chip{padding:8px 12px;border-radius:999px;border:1px solid var(--glass-border);background:transparent;color:var(--muted)}
-.chips .chip.active{background:linear-gradient(90deg,var(--accent2),var(--accent3));color:#061126;box-shadow:0 8px 20px rgba(185,139,255,0.12)}
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.6);
+            font-size: 11px;
+            gap: 4px;
+            transition: all 0.2s;
+            border-radius: 30px;
+            padding: 6px 10px;
+            min-width: 50px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
 
-/* store grid */
-.store-grid{display:flex;flex-direction:column;gap:10px}
-.store-card{display:flex;align-items:center;gap:12px;padding:12px}
-.store-logo{width:44;height:44;border-radius:10px;background:linear-gradient(180deg,#fff1,#fff2);display:flex;align-items:center;justify-content:center;color:#041229;font-weight:700}
-.rate{font-size:12px;color:var(--muted)}
+        .nav-item i {
+            font-size: 20px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
 
-/* list */
-.list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
-.list-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:12px}
-.meta{display:flex;flex-direction:column;gap:6px;align-items:flex-start;text-align:right}
-.btn-link{background:transparent;border:none;color:var(--muted)}
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 180, 255, 0.3), inset 0 0 0 1px rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
 
-/* wallet */
-.balance{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:14px}
-.balance .amount{font-size:18px;font-weight:700}
-.cards{display:flex;flex-direction:column;gap:10px}
-.card-bank{padding:14px;border-radius:12px}
-.card-top{display:flex;justify-content:space-between;align-items:center}
-.chip{width:30px;height:20px;background:linear-gradient(90deg,var(--accent1),var(--accent2));border-radius:4px}
+        .nav-item.ai-item {
+            background: linear-gradient(145deg, #2a6df4, #9f4cf4);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 40px;
+            box-shadow: 0 8px 20px rgba(90, 70, 250, 0.5);
+            transform: scale(1.1);
+            margin-top: -10px;
+        }
 
-/* chat */
-.chat{display:flex;flex-direction:column;height:65vh; padding:8px}
-.messages{flex:1;overflow:auto;padding:6px;display:flex;flex-direction:column;gap:10px}
-.msg{display:flex}
-.msg.bot{justify-content:flex-start}
-.msg.user{justify-content:flex-end}
-.bubble{max-width:78%;padding:10px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.04)}
-.msg.user .bubble{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#041229}
-.chat-footer{padding-top:8px}
-.input-row{display:flex;gap:8px;align-items:center}
-.input-row input{flex:1;padding:10px;border-radius:12px;border:1px solid var(--glass-border);background:transparent;color:#fff}
-.btn-icon{background:linear-gradient(90deg,var(--accent3),var(--accent2));border:none;padding:10px;border-radius:12px;color:#041229}
-.quick-questions{display:flex;gap:8px;overflow:auto;padding-bottom:8px}
-.chip.small{padding:6px 8px}
+        .nav-item.ai-item i {
+            font-size: 26px;
+        }
 
-/* payments */
-.pay-card{display:flex;gap:12px;align-items:center}
-.pay-info .amount{font-weight:700}
-.pay-actions{display:flex;gap:8px;margin-top:8px}
+        .nav-item.ai-item span {
+            font-size: 10px;
+            font-weight bold;
+        }
 
-/* debts */
-.debt-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
-.debt{display:flex;justify-content:space-between;align-items:center;padding:10px}
-.progress{width:96px;height:8px;background:rgba(255,255,255,0.03);border-radius:99px;overflow:hidden}
-.progress > div{height:100%;background:linear-gradient(90deg,var(--accent1),var(--accent2))}
+        /* glass card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 28px;
+            padding: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255,255,255,0.1);
+            margin-bottom: 18px;
+        }
 
-/* finance */
-.finance-overview{display:flex;justify-content:space-between;align-items:center;padding:10px}
-.section-row{display:flex;gap:10px}
-.tile{flex:1;padding:10px;text-align:right}
-.transactions{list-style:none;padding:0;margin:0}
-.transactions li{display:flex;justify-content:space-between;padding:10px;border-radius:10px}
-.t-right.income{color:var(--accent1);font-weight:700}
-.note{font-size:12px}
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff, #c5d9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
 
-/* profile */
-.profile-top{display:flex;gap:12px;align-items:center}
-.settings{list-style:none;padding:0;margin:12px 0 0 0;display:flex;flex-direction:column;gap:10px}
-.settings li{padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
-.settings .danger{color:#ffb4b4}
+        h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: white;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
 
-/* bottom nav */
-.bottom-nav{
-  position:fixed;left:12px;right:12px;bottom:12px;padding:10px;border-radius:22px;display:flex;align-items:center;justify-content:space-between;z-index:60;
-  backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(3,8,20,0.6);border:1px solid rgba(255,255,255,0.04)
-}
-.nav-left,.nav-right{display:flex;gap:6px;align-items:center}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 8px;border-radius:12px;background:transparent;border:none;color:var(--muted);font-size:11px}
-.nav-item.active{background:linear-gradient(90deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));color:#fff}
-.nav-center{position:relative;display:flex;align-items:center;justify-content:center}
-.nav-ai{position:relative;transform:translateY(-26%);width:68px;height:68px;border-radius:999px;border:none;background:linear-gradient(135deg,var(--accent3),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 18px 40px rgba(185,139,255,0.16)}
-.ai-circle{width:56px;height:56px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;}
+        h3 {
+            font-size: 16px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 8px;
+        }
 
-/* page transitions */
-.page{opacity:0;transform:translateY(16px);transition:all 320ms cubic-bezier(.2,.9,.3,1);display:none}
-.page.active{display:block;opacity:1;transform:none}
+        /* scroll horizontal */
+        .scroll-horizontal {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 4px 0 16px 0;
+            scrollbar-width: none;
+        }
 
-/* small helpers */
-.btn-primary{background:linear-gradient(90deg,var(--accent1),var(--accent2));padding:8px 10px;border-radius:12px;border:none;color:#041229;font-weight:600}
-.btn-primary.small{padding:6px 8px;font-size:13px}
-.btn-ghost{background:transparent;border:1px dashed rgba(255,255,255,0.04);padding:10px;border-radius:12px;color:var(--muted)}
-.small{font-size:12px}
-.muted{color:var(--muted);font-size:13px}
-.big{font-size:16px}
+        .scroll-horizontal::-webkit-scrollbar {
+            display: none;
+        }
 
-/* responsive tweaks */
-@media (min-width:720px){
-  .pages{padding:20px 40px 120px 40px}
-  .bottom-nav{left:24px;right:24px;bottom:20px}
-}
-  </style>
+        .category-chip {
+            background: rgba(255,255,255,0.1);
+            border-radius: 40px;
+            padding: 10px 18px;
+            color: white;
+            font-size: 14px;
+            white-space: nowrap;
+            border: 1px solid rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        /* store card */
+        .store-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 16px;
+            min-width: 160px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn {
+            background: linear-gradient(145deg, #2d7aff, #21b0fe);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 8px 20px rgba(0,120,255,0.4);
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: none;
+            color: white;
+        }
+
+        /* list items */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .badge {
+            background: rgba(255,215,0,0.2);
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-size: 12px;
+            color: #ffd966;
+            border: 1px solid rgba(255,215,0,0.4);
+        }
+
+        /* chat bubbles */
+        .chat-bubble-user {
+            background: linear-gradient(145deg, #2a6df4, #9f4cf4);
+            color: white;
+            padding: 14px 18px;
+            border-radius: 28px 28px 4px 28px;
+            max-width: 80%;
+            align-self: flex-end;
+            margin: 8px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .chat-bubble-bot {
+            background: rgba(30, 40, 60, 0.8);
+            backdrop-filter: blur(10px);
+            color: #eef;
+            padding: 14px 18px;
+            border-radius: 28px 28px 28px 4px;
+            max-width: 80%;
+            align-self: flex-start;
+            margin: 8px 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 8px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 60px;
+            padding: 6px;
+            margin-top: 16px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 14px 18px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .chat-input-area input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .chat-input-area button {
+            background: linear-gradient(145deg, #2d7aff, #21b0fe);
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* progress bar */
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            margin: 12px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2d7aff, #a55cff);
+            width: 65%;
+            border-radius: 20px;
+        }
+
+        /* stats boxes */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* avatar */
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #2a6df4, #9f4cf4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        /* rtl specific */
+        .fa-chevron-left {
+            transform: scaleX(-1);
+        }
+
+        .text-muted {
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+        }
+
+        .small {
+            font-size: 12px;
+        }
+
+        .text-white {
+            color: white;
+        }
+
+        .mt-2 {
+            margin-top: 8px;
+        }
+
+        .mb-2 {
+            margin-bottom: 8px;
+        }
+
+        .d-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gap-2 {
+            gap: 8px;
+        }
+
+        .qr-placeholder {
+            width: 120px;
+            height: 120px;
+            background: repeating-linear-gradient(45deg, #fff 0px, #fff 8px, #333 8px, #333 16px);
+            border-radius: 24px;
+            margin: 0 auto;
+        }
+
+        .install-btn {
+            background: linear-gradient(145deg, #22c55e, #16a34a);
+            margin-top: 20px;
+        }
+    </style>
 </head>
-<body class="app">
-  <div class="app-bg"></div>
-
-  <header class="topbar">
-    <div class="topbar-left">
-      <button class="btn-icon" id="installBtn" aria-label="نصب اپ" style="display:none">نصب</button>
-    </div>
-    <div class="topbar-title">سوپر اپ اعتبار</div>
-    <div class="topbar-right">
-      <div class="user-badge">
-        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='20' r='12' fill='%23ffffff'/%3E%3Cpath d='M6 58c0-14 10-26 26-26s26 12 26 26' fill='none' stroke='%23ffffff' stroke-opacity='0.2' stroke-width='2'/%3E%3C/svg%3E" alt="avatar">
-      </div>
-    </div>
-  </header>
-
-  <main class="pages" id="pages">
-    <!-- فروشگاه -->
-    <section class="page active" id="page-store" aria-hidden="false">
-      <div class="hero">
-        <div>
-          <h1>خرید اعتباری</h1>
-          <p class="muted">خرید کن، قسطی پرداخت کن — بهترین پیشنهادها را مقایسه کن</p>
-        </div>
-        <button class="cta">دریافت اعتبار</button>
-      </div>
-
-      <div class="section">
-        <div class="section-header">
-          <h3>پیشنهاد ویژه</h3>
-          <button class="link">مشاهده همه</button>
-        </div>
-        <div class="carousel" id="promoScroll">
-          <!-- promo cards -->
-          <div class="card glass promo">
-            <div class="card-top">
-              <div class="brand">دیجی‌مارکت</div>
-              <div class="limit">اعتبار تا <strong>۵,۰۰۰,۰۰۰</strong></div>
+<body>
+    <div id="app">
+        <!-- main content pages (7 tabs) -->
+        <div class="main-content" id="mainContent">
+            <!-- صفحه فروشگاه -->
+            <div class="tab-content active" id="tab-shop">
+                <div class="glass-card" style="background: linear-gradient(145deg, #2b3b6e, #1b2b55);">
+                    <h1 class="gradient-text" style="font-size: 24px;">خرید اعتباری</h1>
+                    <p style="color: #b0c8ff;">تا ۱۲ قسط بدون ضامن</p>
+                </div>
+                <div class="scroll-horizontal">
+                    <span class="category-chip">الکترونیک</span>
+                    <span class="category-chip">مد و پوشاک</span>
+                    <span class="category-chip">خانه</span>
+                    <span class="category-chip">ورزش</span>
+                    <span class="category-chip">کالای دیجیتال</span>
+                </div>
+                <h2>پیشنهاد ویژه</h2>
+                <div class="scroll-horizontal">
+                    <div class="store-card">
+                        <i class="fas fa-store" style="color: #7aa2ff; font-size: 24px;"></i>
+                        <h3>دیجی‌کالا</h3>
+                        <p>اعتبار ۵ میلیون</p>
+                        <p>کارمزد ۰٪</p>
+                        <p>۴ قسط</p>
+                        <button class="btn" style="padding: 8px;">دریافت اعتبار</button>
+                    </div>
+                    <div class="store-card">
+                        <i class="fas fa-tshirt" style="color: #ff7aa2;"></i>
+                        <h3>مدیسا</h3>
+                        <p>اعتبار ۳ میلیون</p>
+                        <p>کارمزد ۴٪</p>
+                        <p>۳ قسط</p>
+                        <button class="btn" style="padding: 8px;">دریافت اعتبار</button>
+                    </div>
+                </div>
+                <h2>فروشگاه‌های همکار</h2>
+                <div class="glass-card">
+                    <div class="list-item">
+                        <div><i class="fas fa-laptop"></i> فروشگاه آل‌دیجیتال</div>
+                        <div>۲ میلیون <span class="badge">۴ قسط</span></div>
+                    </div>
+                    <div class="list-item">
+                        <div><i class="fas fa-couch"></i> خانه مدرن</div>
+                        <div>۴ میلیون <span class="badge">۶ قسط</span></div>
+                    </div>
+                    <div class="list-item">
+                        <div><i class="fas fa-mobile-alt"></i> موبایل ایران</div>
+                        <div>۷ میلیون <span class="badge">۱۲ قسط</span></div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">۳ قسط بدون کارمزد</div>
-            <button class="btn-primary">دریافت</button>
-          </div>
 
-          <div class="card glass promo">
-            <div class="card-top"><div class="brand">فروشگاه لباس</div><div class="limit">اعتبار تا <strong>۲,۰۰۰,۰۰۰</strong></div></div>
-            <div class="card-body">۶ قسط با کارمزد ۲٪</div>
-            <button class="btn-primary">دریافت</button>
-          </div>
-
-          <div class="card glass promo">
-            <div class="card-top"><div class="brand">سازمان تجهیزات</div><div class="limit">تا <strong>۱۰,۰۰۰,۰۰۰</strong></div></div>
-            <div class="card-body">۱۲ قسط با تخفیف ویژه</div>
-            <button class="btn-primary">دریافت</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <h4>دسته‌بندی‌ها</h4>
-        <div class="chips" id="cats">
-          <button class="chip active">همه</button>
-          <button class="chip">الکترونیک</button>
-          <button class="chip">پوشاک</button>
-          <button class="chip">خدمات</button>
-          <button class="chip">مواد غذایی</button>
-        </div>
-
-        <div class="store-grid">
-          <article class="store-card glass">
-            <div class="store-left">
-              <div class="store-logo">دیجی</div>
+            <!-- صفحه اعتبارات -->
+            <div class="tab-content" id="tab-credits">
+                <h2>دریافت اعتبار و وام</h2>
+                <div class="glass-card" style="background: linear-gradient(145deg, #4f46e5, #7c3aed);">
+                    <p style="color: #eee;">✨ پیشنهاد هوشمند</p>
+                    <p style="font-weight: bold;">با توجه به اطلاعات اعتبارسنجی شما، وام ۱۰۰ میلیونی کالانو بانک تجارت با بازپرداخت ۱۲ ماهه آماده است.</p>
+                    <button class="btn" style="margin-top: 12px;">شروع فرآیند دریافت</button>
+                </div>
+                <div class="glass-card">
+                    <div class="list-item">
+                        <div><span style="font-weight: bold;">بانک تجارت</span> - کالانو</div>
+                        <div>۱۰۰م / ۱۲ ماه / ۴٪</div>
+                        <button class="btn-outline btn" style="width: auto; padding: 6px 12px;">جزئیات</button>
+                    </div>
+                    <div class="list-item">
+                        <div><span style="font-weight: bold;">بانک ملت</span> - بهین کارت</div>
+                        <div>۵۰م / ۲۴ ماه / ۶٪</div>
+                        <button class="btn-outline btn" style="width: auto; padding: 6px 12px;">جزئیات</button>
+                    </div>
+                    <div class="list-item">
+                        <div><span style="font-weight: bold;">بانک ملی</span> - مهربانی</div>
+                        <div>۳۰م / ۱۸ ماه / ۰٪</div>
+                        <button class="btn-outline btn" style="width: auto; padding: 6px 12px;">جزئیات</button>
+                    </div>
+                    <div class="list-item">
+                        <div><span style="font-weight: bold;">بلوبانک</span> - وام دیجیتال</div>
+                        <div>۲۰م / ۶ ماه / ۲٪</div>
+                        <button class="btn-outline btn" style="width: auto; padding: 6px 12px;">جزئیات</button>
+                    </div>
+                    <div class="list-item">
+                        <div><span style="font-weight: bold;">تارا</span> - اعتبار خرید</div>
+                        <div>۵م / ۳ قسط / ۰٪</div>
+                        <button class="btn-outline btn" style="width: auto; padding: 6px 12px;">جزئیات</button>
+                    </div>
+                </div>
             </div>
-            <div class="store-mid">
-              <h5>دیجی‌مارکت</h5>
-              <p class="muted">اعتبار تا ۵,۰۰۰,۰۰۰ — ۳ قسط</p>
+
+            <!-- صفحه کیف پول -->
+            <div class="tab-content" id="tab-wallet">
+                <h2>کیف پول</h2>
+                <div class="glass-card">
+                    <div class="d-flex">
+                        <span>موجودی کل</span>
+                        <span style="font-size: 28px;">۱۲,۵۰۰,۰۰۰</span>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <span>اعتبار فعال</span>
+                        <span>۸,۲۰۰,۰۰۰</span>
+                    </div>
+                </div>
+                <div class="glass-card" style="background: linear-gradient(145deg, #1e2b4a, #0f1a2f);">
+                    <div class="d-flex">
+                        <span><i class="fab fa-cc-mastercard"></i> کارت ملت</span>
+                        <span>**** ۱۲۳۴</span>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <span><i class="fab fa-cc-visa"></i> کارت ملی</span>
+                        <span>**** ۵۶۷۸</span>
+                    </div>
+                    <button class="btn-outline btn mt-2">+ افزودن کارت جدید</button>
+                </div>
+                <button class="btn">افتتاح حساب جدید</button>
             </div>
-            <div class="store-right">
-              <div class="rate">کارمزد ۰%</div>
+
+            <!-- صفحه هوش مصنوعی (چت) -->
+            <div class="tab-content" id="tab-ai">
+                <h2>مشاور هوشمند اعتبار</h2>
+                <div class="glass-card" style="display: flex; flex-direction: column; min-height: 400px;">
+                    <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;" id="chatBox">
+                        <div class="chat-bubble-bot">سلام 👋 من دستیار هوشمند وام‌یار هستم. چطور می‌توانم کمک کنم؟</div>
+                        <div class="chat-bubble-user">الان چه وام هایی میتونم بگیرم؟</div>
+                        <div class="chat-bubble-bot">با توجه به اطلاعات اعتبارسنجی شما، وام ۱۰۰ میلیونی کالانو بانک تجارت با بازپرداخت ۱۲ ماهه. مایل هستید آموزش کامل دریافت را ببینید؟</div>
+                    </div>
+                    <div class="scroll-horizontal" style="margin: 10px 0;">
+                        <span class="category-chip" onclick="addUserMessage('الان چه وام هایی میتونم بگیرم؟')">وام‌های موجود</span>
+                        <span class="category-chip" onclick="addUserMessage('الان چه اعتبار هایی میتونم بگیرم؟')">اعتبارهای فعال</span>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" placeholder="سوال خود را بپرسید..." id="chatInput">
+                        <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
             </div>
-          </article>
 
-          <article class="store-card glass">
-            <div class="store-left"><div class="store-logo">تجارت</div></div>
-            <div class="store-mid"><h5>فروشگاه پوشاک</h5><p class="muted">اعتبار تا ۲,۰۰۰,۰۰۰ — ۶ قسط</p></div>
-            <div class="store-right"><div class="rate">کارمزد ۲%</div></div>
-          </article>
-
-          <article class="store-card glass">
-            <div class="store-left"><div class="store-logo">مارکت</div></div>
-            <div class="store-mid"><h5>سرویس لوازم خانگی</h5><p class="muted">اعتبار تا ۱۰,۰۰۰,۰۰۰ — ۱۲ قسط</p></div>
-            <div class="store-right"><div class="rate">کارمزد ۱.۵%</div></div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- اعتبارات -->
-    <section class="page" id="page-credits" aria-hidden="true">
-      <div class="section hero-compact glass">
-        <h2>دریافت اعتبار و وام</h2>
-        <p class="muted">لیست بانک‌ها و سرویس‌های متصل</p>
-      </div>
-
-      <div class="section">
-        <h4>بانک‌ها و سرویس‌ها</h4>
-        <ul class="list glass">
-          <li class="list-item">
-            <div>
-              <strong>بانک تجارت</strong>
-              <p class="muted">وام کالانو</p>
+            <!-- صفحه پرداخت -->
+            <div class="tab-content" id="tab-payment">
+                <h2>پرداخت و اقساط</h2>
+                <div class="glass-card" style="text-align: center;">
+                    <div class="qr-placeholder"></div>
+                    <p class="mt-2">اسکن کنید و مبلغ را پرداخت کنید</p>
+                    <div class="d-flex gap-2" style="justify-content: center;">
+                        <span class="badge">۵۰۰,۰۰۰ تومان</span>
+                        <button class="btn" style="width: auto;">اسکن</button>
+                    </div>
+                    <p class="text-muted mt-2">پرداخت با NFC نیز فعال است</p>
+                </div>
+                <h3>مدیریت بدهی‌ها</h3>
+                <div class="glass-card">
+                    <div class="d-flex"><span>کل بدهی</span><span>۱۰,۱۶۶,۰۰۰</span></div>
+                    <div class="d-flex mt-1"><span>قسط بعدی</span><span>۱,۶۶۶,۰۰۰</span></div>
+                    <div class="d-flex mt-1"><span>سررسید</span><span>۲۰ اسفند</span></div>
+                    <div class="progress-bar"><div class="progress-fill"></div></div>
+                    <button class="btn">پرداخت قسط</button>
+                </div>
+                <div class="list-item">
+                    <span>قسط کالانو</span><span>۸,۵۰۰,۰۰۰</span><span class="badge">۲۰ اسفند</span>
+                </div>
+                <div class="list-item">
+                    <span>اعتبار تارا</span><span>۱,۶۶۶,۰۰۰</span><span class="badge">۵ فروردین</span>
+                </div>
             </div>
-            <div class="meta">
-              <div>سقف: ۱۰۰,۰۰۰,۰۰۰</div>
-              <div>مدت: ۱۲ ماه</div>
-              <button class="btn-link">جزئیات</button>
+
+            <!-- صفحه حسابداری شخصی -->
+            <div class="tab-content" id="tab-accounting">
+                <h2>داشبورد مالی</h2>
+                <div class="stat-grid">
+                    <div class="stat-box"><span>هزینه</span><br><span style="font-size: 22px;">۲,۹۷۰,۰۰۰</span></div>
+                    <div class="stat-box"><span>درآمد</span><br><span style="font-size: 22px;">۱۷,۰۰۰,۰۰۰</span></div>
+                    <div class="stat-box"><span>دارایی</span><br><span style="font-size: 22px;">۴۲,۵۰۰,۰۰۰</span></div>
+                    <div class="stat-box"><span>بدهی</span><br><span style="font-size: 22px;">۱۰,۱۶۶,۰۰۰</span></div>
+                </div>
+                <div class="glass-card">
+                    <p class="text-muted">نمودار خلاصه ماهانه (نمایشی)</p>
+                    <div style="height: 60px; background: rgba(255,255,255,0.1); border-radius: 20px;"></div>
+                </div>
+                <h3>تراکنش‌ها</h3>
+                <div class="glass-card">
+                    <div class="list-item"><span>🛒 خرید لپ‌تاپ</span><span>-۲,۵۰۰,۰۰۰</span></div>
+                    <div class="list-item"><span>🚖 تاکسی اینترنتی</span><span>-۱۲۰,۰۰۰</span></div>
+                    <div class="list-item"><span>🍔 رستوران</span><span>-۳۵۰,۰۰۰</span></div>
+                    <div class="list-item"><span>💼 حقوق ماهانه</span><span>+۱۵,۰۰۰,۰۰۰</span></div>
+                    <div class="list-item"><span>💻 پروژه فریلنس</span><span>+۲,۰۰۰,۰۰۰</span></div>
+                </div>
+                <div class="glass-card">
+                    <p class="text-muted">📱 این اطلاعات به صورت خودکار از پیامک‌های بانکی شما تحلیل شده است.</p>
+                </div>
             </div>
-          </li>
 
-          <li class="list-item">
-            <div><strong>بانک ملت</strong><p class="muted">وام بهین کارت</p></div>
-            <div class="meta"><div>سقف: ۵۰,۰۰۰,۰۰۰</div><div>مدت: ۶ تا ۱۸ ماه</div><button class="btn-link">جزئیات</button></div>
-          </li>
-
-          <li class="list-item">
-            <div><strong>بانک ملی</strong><p class="muted">طرح مهربانی</p></div>
-            <div class="meta"><div>سقف: ۲۰,۰۰۰,۰۰۰</div><div>مدت: ۳۶ ماه</div><button class="btn-link">جزئیات</button></div>
-          </li>
-
-          <li class="list-item">
-            <div><strong>بلوبانک</strong><p class="muted">وام دیجیتال</p></div>
-            <div class="meta"><div>سقف: ۱۵,۰۰۰,۰۰۰</div><div>مدت: ۱۲ ماه</div><button class="btn-link">جزئیات</button></div>
-          </li>
-
-          <li class="list-item">
-            <div><strong>تارا</strong><p class="muted">اعتبار خرید اقساطی</p></div>
-            <div class="meta"><div>سقف: ۵,۰۰۰,۰۰۰</div><div>مدت: ۳ قسط</div><button class="btn-link">جزئیات</button></div>
-          </li>
-        </ul>
-      </div>
-
-      <div class="section">
-        <h4>پیشنهاد هوشمند</h4>
-        <div class="smart-card glass highlight">
-          <p class="muted">با توجه به اطلاعات اعتبارسنجی و بانک‌های متصل به حساب شما،</p>
-          <p class="big">شما می‌توانید <strong>وام ۱۰۰ میلیون تومانی کالانو بانک تجارت</strong> با بازپرداخت <strong>۱۲ ماهه</strong> دریافت کنید.</p>
-          <button class="btn-primary">شروع فرآیند دریافت</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- کیف پول -->
-    <section class="page" id="page-wallet" aria-hidden="true">
-      <div class="section hero-compact glass">
-        <h2>کیف پول</h2>
-        <p class="muted">نمای کلی حساب‌ها و کارت‌ها</p>
-      </div>
-
-      <div class="section">
-        <div class="balance glass">
-          <div>
-            <div class="label">موجودی کل</div>
-            <div class="amount">۱۲,۳۴۵,۶۰۰ <span class="toman">تومان</span></div>
-          </div>
-          <div class="small">اعتبار فعال: ۵,۰۰۰,۰۰۰</div>
-        </div>
-
-        <div class="cards">
-          <div class="card glass card-bank">
-            <div class="card-top">
-              <div class="chip"></div>
-              <div class="bank-name">بانک ملت</div>
+            <!-- صفحه حساب کاربری -->
+            <div class="tab-content" id="tab-profile">
+                <div class="glass-card" style="display: flex; flex-direction: column; align-items: center;">
+                    <div class="avatar">ع</div>
+                    <h3>علی رضایی</h3>
+                    <div class="d-flex gap-2">
+                        <span class="badge">سطح اعتبار: نقره‌ای</span>
+                        <span class="badge">امتیاز: ۶۸۰</span>
+                    </div>
+                    <span class="badge" style="background: #22c55e20; color: #4ade80;">احراز هویت شده</span>
+                </div>
+                <div class="glass-card">
+                    <div class="list-item"><i class="fas fa-user"></i> اطلاعات شخصی <i class="fas fa-chevron-left"></i></div>
+                    <div class="list-item"><i class="fas fa-file"></i> مدارک <i class="fas fa-chevron-left"></i></div>
+                    <div class="list-item"><i class="fas fa-cog"></i> تنظیمات <i class="fas fa-chevron-left"></i></div>
+                    <div class="list-item"><i class="fas fa-lock"></i> امنیت <i class="fas fa-chevron-left"></i></div>
+                    <div class="list-item"><i class="fas fa-sign-out-alt"></i> خروج <i class="fas fa-chevron-left"></i></div>
+                </div>
+                <button class="btn install-btn" id="installAppBtn" style="display: none;">📲 نصب اپلیکیشن</button>
             </div>
-            <div class="card-num">**** ۲۳۴۵</div>
-            <div class="card-bottom">موجودی: ۳,۴۵۶,۰۰۰</div>
-          </div>
-
-          <div class="card glass card-bank">
-            <div class="card-top">
-              <div class="chip"></div>
-              <div class="bank-name">بلوبانک</div>
-            </div>
-            <div class="card-num">**** ۱۲۳۴</div>
-            <div class="card-bottom">اعتبار فعال: ۵,۰۰۰,۰۰۰</div>
-          </div>
-
-          <button class="btn-ghost">افزودن کارت</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- هوش مصنوعی (چت) -->
-    <section class="page" id="page-ai" aria-hidden="true">
-      <div class="section hero-compact glass">
-        <h2>مشاور هوشمند اعتبار</h2>
-        <p class="muted">چت نمایشی — فقط رابط کاربری</p>
-      </div>
-
-      <div class="chat glass">
-        <div class="messages" id="chatMessages">
-          <div class="msg bot">
-            <div class="bubble">
-              <p><strong>سلام!</strong> من مشاور هوشمند شما هستم. از یکی از سوالات سریع انتخاب کنید یا پیام خود را بنویسید.</p>
-            </div>
-          </div>
-
-          <div class="msg user">
-            <div class="bubble">الان چه وام هایی میتونم بگیرم؟</div>
-          </div>
-
-          <div class="msg bot">
-            <div class="bubble">
-              <p>با توجه به اطلاعات اعتبارسنجی و بانک‌هایی که از شما در اختیار دارم، شما می‌توانید وام <strong>۱۰۰ میلیونی</strong> با بازپرداخت <strong>۱۲ ماهه</strong> کالانو بانک تجارت را دریافت کنید. مایل هستید آموزش کامل فرآیند را برایتان شرح دهم؟</p>
-              <div class="quick"> <button class="chip">آموزش فرایند</button> <button class="chip">شرایط بیشتر</button> </div>
-            </div>
-          </div>
-
-          <div class="msg user">
-            <div class="bubble">الان چه اعتبار هایی میتونم بگیرم؟</div>
-          </div>
-
-          <div class="msg bot">
-            <div class="bubble">
-              <p>در حال حاضر می‌توانید از <strong>اعتبار ۵ میلیونی تارا</strong> استفاده کنید و آن را در <strong>۳ قسط بدون سود</strong> بازپرداخت نمایید.</p>
-              <div class="quick"> <button class="chip">دریافت تارا</button> <button class="chip">مقایسه</button> </div>
-            </div>
-          </div>
         </div>
 
-        <div class="chat-footer">
-          <div class="quick-questions">
-            <button class="chip small">چه وام‌هایی می‌تونم بگیرم؟</button>
-            <button class="chip small">اعتبار فروشگاهی</button>
-            <button class="chip small">وضعیت مالی من</button>
-          </div>
-          <div class="input-row">
-            <input id="chatInput" placeholder="سوال خود را بنویسید..." />
-            <button id="sendMsg" class="btn-icon">ارسال</button>
-          </div>
+        <!-- bottom navbar -->
+        <div class="bottom-nav" id="bottomNav">
+            <button class="nav-item active" data-tab="shop"><i class="fas fa-store"></i><span>فروشگاه</span></button>
+            <button class="nav-item" data-tab="credits"><i class="fas fa-hand-holding-usd"></i><span>اعتبارات</span></button>
+            <button class="nav-item" data-tab="wallet"><i class="fas fa-wallet"></i><span>کیف پول</span></button>
+            <button class="nav-item ai-item" data-tab="ai"><i class="fas fa-robot"></i><span>AI</span></button>
+            <button class="nav-item" data-tab="payment"><i class="fas fa-credit-card"></i><span>پرداخت</span></button>
+            <button class="nav-item" data-tab="accounting"><i class="fas fa-chart-pie"></i><span>حسابداری</span></button>
+            <button class="nav-item" data-tab="profile"><i class="fas fa-user-circle"></i><span>حساب</span></button>
         </div>
-      </div>
-    </section>
-
-    <!-- پرداخت -->
-    <section class="page" id="page-pay" aria-hidden="true">
-      <div class="section hero-compact glass">
-        <h2>خرید حضوری و مدیریت اقساط</h2>
-        <p class="muted">پرداخت سریع یا برنامه‌ریزی اقساط</p>
-      </div>
-
-      <div class="section">
-        <h4>پرداخت حضوری</h4>
-        <div class="pay-card glass">
-          <div class="qr">
-            <svg width="120" height="120" viewBox="0 0 120 120"><rect width="120" height="120" rx="12" fill="rgba(255,255,255,0.06)"/><rect x="10" y="10" width="30" height="30" fill="#fff"/><rect x="80" y="10" width="30" height="30" fill="#fff"/><rect x="10" y="80" width="30" height="30" fill="#fff"/></svg>
-          </div>
-          <div class="pay-info">
-            <div class="amount">مبلغ: <strong>۱,۲۵۰,۰۰۰ تومان</strong></div>
-            <div class="muted">پرداخت با NFC یا اسکن QR</div>
-            <div class="pay-actions"><button class="btn-primary">اسکن</button><button class="btn-ghost">پرداخت NFC</button></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <h4>مدیریت بدهی‌ها</h4>
-        <ul class="debt-list">
-          <li class="debt glass">
-            <div>
-              <strong>قسط کالانو</strong>
-              <p class="muted">مبلغ قسط: ۸,۵۰۰,۰۰۰ — سررسید: ۲۰ اسفند</p>
-            </div>
-            <div class="debt-meta">
-              <div class="progress"><div style="width:40%"></div></div>
-              <button class="btn-primary small">پرداخت قسط</button>
-            </div>
-          </li>
-          <li class="debt glass">
-            <div><strong>اعتبار تارا</strong><p class="muted">قسط اول: ۱,۶۶۶,۰۰۰ — سررسید: ۱۰ فروردین</p></div>
-            <div class="debt-meta"><div class="progress"><div style="width:10%"></div></div><button class="btn-primary small">پرداخت قسط</button></div>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- حسابداری شخصی -->
-    <section class="page" id="page-finance" aria-hidden="true">
-      <div class="section hero-compact glass">
-        <h2>حسابداری شخصی</h2>
-        <p class="muted">هزینه‌ها، درآمدها، دارایی‌ها و بدهی‌ها</p>
-      </div>
-
-      <div class="section">
-        <div class="finance-overview glass">
-          <div class="col">
-            <div class="label">ماه جاری</div>
-            <div class="big">نمای کلی</div>
-          </div>
-          <div class="col">
-            <canvas id="miniChart" width="200" height="80"></canvas>
-          </div>
-        </div>
-
-        <div class="section-row">
-          <div class="tile glass">
-            <div class="tile-title">هزینه</div>
-            <div class="tile-amount">٢,٩٧۰,٠٠٠</div>
-          </div>
-          <div class="tile glass">
-            <div class="tile-title">درآمد</div>
-            <div class="tile-amount">١٧,٠٠٠,٠٠٠</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <h4>تراکنش‌ها</h4>
-        <ul class="transactions glass">
-          <li><div class="t-left"><div class="t-title">خرید لپ‌تاپ</div><div class="muted">فروشگاه دیجیتال</div></div><div class="t-right">-۲,۵۰۰,۰۰۰</div></li>
-          <li><div class="t-left"><div class="t-title">تاکسی اینترنتی</div><div class="muted">ساعت ۱۴:۱۲</div></div><div class="t-right">-۱۲۰,۰۰۰</div></li>
-          <li><div class="t-left"><div class="t-title">رستوران</div><div class="muted">شام</div></div><div class="t-right">-۳۵۰,۰۰۰</div></li>
-          <li><div class="t-left"><div class="t-title">حقوق ماهانه</div><div class="muted">شرکت</div></div><div class="t-right income">+۱۵,۰۰۰,۰۰۰</div></li>
-        </ul>
-        <p class="muted small note">این اطلاعات به صورت خودکار از پیامک‌های بانکی شما تحلیل شده است. (نمایشی)</p>
-      </div>
-    </section>
-
-    <!-- حساب کاربری -->
-    <section class="page" id="page-profile" aria-hidden="true">
-      <div class="section hero-compact glass">
-        <h2>حساب کاربری</h2>
-        <p class="muted">وضعیت و تنظیمات حساب</p>
-      </div>
-
-      <div class="section profile glass">
-        <div class="profile-top">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='32' r='18' fill='%23fff'/%3E%3Cpath d='M10 70c0-17 13-30 30-30s30 13 30 30' fill='none' stroke='%23fff' stroke-opacity='0.15'/%3E%3C/svg%3E" alt="avatar">
-          <div>
-            <h3>مهدیه میرزایی</h3>
-            <div class="muted">سطح اعتبار: خوب • امتیاز: ۷۴</div>
-          </div>
-        </div>
-
-        <ul class="settings">
-          <li>اطلاعات شخصی</li>
-          <li>مدارک</li>
-          <li>تنظیمات</li>
-          <li>امنیت</li>
-          <li class="danger">خروج</li>
-        </ul>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Bottom Navigation -->
-  <nav class="bottom-nav glass" role="navigation" aria-label="ناوبری پایین">
-    <div class="nav-left">
-      <button class="nav-item" data-target="page-store"><span class="icon">🛍️</span><span class="label">فروشگاه</span></button>
-      <button class="nav-item" data-target="page-credits"><span class="icon">🏦</span><span class="label">اعتبارات</span></button>
-      <button class="nav-item" data-target="page-wallet"><span class="icon">👛</span><span class="label">کیف پول</span></button>
     </div>
 
-    <div class="nav-center">
-      <button id="aiBtn" class="nav-ai" data-target="page-ai" aria-label="هوش مصنوعی">
-        <div class="ai-circle">
-          <svg width="28" height="28" viewBox="0 0 24 24"><path fill="#fff" d="M12 2L15 8h6l-4.8 3.5L18 20l-6-4-6 4 1.8-8.5L3 8h6z"/></svg>
-        </div>
-      </button>
-    </div>
+    <script>
+        // script.js
+        (function() {
+            // tab switching
+            const tabs = document.querySelectorAll('.nav-item');
+            const contents = document.querySelectorAll('.tab-content');
 
-    <div class="nav-right">
-      <button class="nav-item" data-target="page-pay"><span class="icon">💳</span><span class="label">پرداخت</span></button>
-      <button class="nav-item" data-target="page-finance"><span class="icon">📊</span><span class="label">حسابداری</span></button>
-      <button class="nav-item" data-target="page-profile"><span class="icon">👤</span><span class="label">حساب کاربری</span></button>
-    </div>
-  </nav>
-
-  <template id="offlineTpl">
-    <div class="offline glass" style="position:fixed;left:12px;right:12px;top:84px;z-index:80"><h3>آفلاین</h3><p class="muted">نسخه محدود آفلاین—برخی ویژگی‌ها در دسترس نیستند.</p></div>
-  </template>
-
-  <script>
-/* app.js - Inlined: Navigation, interactions, PWA install & SW registration via blob, manifest blob */
-"use strict";
-
-const pages = document.querySelectorAll('.page');
-const navItems = document.querySelectorAll('.nav-item');
-const aiBtn = document.getElementById('aiBtn');
-const installBtn = document.getElementById('installBtn');
-let deferredPrompt = null;
-
-// Navigation
-function showPage(id){
-  pages.forEach(p=>{
-    if(p.id===id){ p.classList.add('active'); p.setAttribute('aria-hidden','false'); }
-    else { p.classList.remove('active'); p.setAttribute('aria-hidden','true'); }
-  });
-  navItems.forEach(n=> n.classList.toggle('active', n.dataset.target === id));
-  const active = document.getElementById(id);
-  if(active) active.scrollTop = 0;
-}
-navItems.forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    showPage(btn.dataset.target);
-  });
-});
-aiBtn.addEventListener('click', ()=> showPage(aiBtn.dataset.target));
-
-// default active
-showPage('page-store');
-
-// Chat UI (fake)
-const chatInput = document.getElementById('chatInput');
-const sendMsg = document.getElementById('sendMsg');
-const chatMessages = document.getElementById('chatMessages');
-
-function appendMessage(text, who='user'){
-  const el = document.createElement('div'); el.className = 'msg '+who;
-  const bubble = document.createElement('div'); bubble.className='bubble';
-  bubble.innerHTML = text;
-  el.appendChild(bubble);
-  chatMessages.appendChild(el);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-if(sendMsg){
-  sendMsg.addEventListener('click', ()=>{
-    const v = chatInput.value.trim(); if(!v) return;
-    appendMessage(v,'user');
-    chatInput.value='';
-    setTimeout(()=> {
-      appendMessage('این پاسخ نمایشی است. برای مشاهده پیشنهادات از دکمه‌های پیشنهادی استفاده کنید.','bot');
-    },600);
-  });
-}
-
-// quick chips binding
-document.querySelectorAll('.quick-questions .chip, .quick .chip').forEach(c=>{
-  c.addEventListener('click', ()=> {
-    const q = c.textContent.trim();
-    appendMessage(q,'user');
-    setTimeout(()=> appendMessage('در حال بررسی... (پاسخ نمایشی) شما می‌توانید ...','bot'),700);
-  });
-});
-
-// mini chart draw (simple)
-(function drawMini(){
-  const canvas = document.getElementById('miniChart');
-  if(!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width, h = canvas.height;
-  const data = [2,6,4,8,5,7,6];
-  const max = Math.max(...data);
-  ctx.clearRect(0,0,w,h);
-  ctx.lineWidth=2;
-  ctx.beginPath();
-  data.forEach((d,i)=>{
-    const x = (i/(data.length-1))*(w-8)+4;
-    const y = h - ((d/max)*(h-12)+6);
-    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-  });
-  const g = ctx.createLinearGradient(0,0,w,0); g.addColorStop(0,'#6ee7b7'); g.addColorStop(1,'#8bd3ff');
-  ctx.strokeStyle = g; ctx.stroke();
-})();
-
-// PWA Install prompt handling
-window.addEventListener('beforeinstallprompt', (e)=>{
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.style.display='inline-block';
-});
-installBtn.addEventListener('click', async ()=>{
-  if(!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const choice = await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  installBtn.style.display='none';
-});
-
-// offline template insert when offline
-window.addEventListener('offline', ()=> {
-  if(!document.querySelector('.offline')){
-    const tpl = document.getElementById('offlineTpl');
-    document.body.appendChild(tpl.content.cloneNode(true));
-  }
-});
-
-/* Create manifest dynamically as blob and link it */
-(function createManifest(){
-  try{
-    const manifest = {
-      "short_name":"اعتبار",
-      "name":"سوپر اپ اعتبار و مدیریت مالی",
-      "icons":[
-        {"src":"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect rx='24' width='128' height='128' fill='%230b1226'/%3E%3Ccircle cx='64' cy='48' r='20' fill='%23ffffff' opacity='0.06'/%3E%3Cpath d='M36 80h56v8H36z' fill='%23ffffff' opacity='0.06'/%3E%3C/svg%3E","sizes":"128x128","type":"image/svg+xml"}
-      ],
-      "start_url":"./",
-      "display":"standalone",
-      "background_color":"#0b1226",
-      "theme_color":"#0b1226",
-      "orientation":"portrait"
-    };
-    const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = url;
-    document.head.appendChild(link);
-  }catch(e){console.warn('manifest failed',e)}
-})();
-
-/* Service Worker code as a string. It will cache the current page path for offline. */
-(function registerInlineSW(){
-  if(!('serviceWorker' in navigator)) return;
-  const currentPath = location.pathname || '/';
-  const swCode = `
-    const CACHE = 'app-shell-v1';
-    const ASSETS = ['${currentPath}'];
-    self.addEventListener('install', (e) => {
-      e.waitUntil(
-        caches.open(CACHE).then((cache) => cache.addAll(ASSETS))
-      );
-      self.skipWaiting();
-    });
-    self.addEventListener('activate', (e) => {
-      e.waitUntil(
-        caches.keys().then(keys => Promise.all(keys.map(k => {
-          if(k !== CACHE) return caches.delete(k);
-        })))
-      );
-      self.clients.claim();
-    });
-    self.addEventListener('fetch', (e) => {
-      const req = e.request;
-      if(req.mode === 'navigate'){
-        e.respondWith(
-          fetch(req).then(r => {
-            return r;
-          }).catch(()=> caches.match(ASSETS[0]))
-        );
-        return;
-      }
-      e.respondWith(
-        caches.match(req).then(cached => {
-          if(cached) return cached;
-          return fetch(req).then(resp => {
-            if(req.method === 'GET' && resp && resp.status === 200 && resp.type !== 'opaque'){
-              const copy = resp.clone();
-              caches.open(CACHE).then(cache => cache.put(req, copy));
+            function switchTab(tabId) {
+                contents.forEach(c => c.classList.remove('active'));
+                document.getElementById('tab-' + tabId).classList.add('active');
+                tabs.forEach(t => t.classList.remove('active'));
+                document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
             }
-            return resp;
-          }).catch(()=> caches.match(ASSETS[0]));
-        })
-      );
-    });
-  `;
-  try{
-    const blob = new Blob([swCode], {type:'application/javascript'});
-    const swUrl = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(swUrl).then(reg=>{
-      console.log('SW registered (inline blob)', reg);
-    }).catch(err=>{
-      console.warn('SW register failed', err);
-    });
-  }catch(err){
-    console.warn('SW creation failed', err);
-  }
-})();
 
-</script>
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const tabId = tab.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+
+            // PWA install
+            let deferredPrompt;
+            const installBtn = document.getElementById('installAppBtn');
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                installBtn.style.display = 'block';
+            });
+
+            installBtn.addEventListener('click', async () => {
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(outcome);
+                deferredPrompt = null;
+                installBtn.style.display = 'none';
+            });
+
+            // chat simulation
+            window.addUserMessage = function(text) {
+                const chatBox = document.getElementById('chatBox');
+                const userMsg = document.createElement('div');
+                userMsg.className = 'chat-bubble-user';
+                userMsg.innerText = text;
+                chatBox.appendChild(userMsg);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // bot response
+                setTimeout(() => {
+                    const botMsg = document.createElement('div');
+                    botMsg.className = 'chat-bubble-bot';
+                    if (text.includes('وام')) {
+                        botMsg.innerText = 'با توجه به اطلاعات اعتبارسنجی شما، وام ۱۰۰ میلیونی کالانو بانک تجارت با بازپرداخت ۱۲ ماهه. مایل هستید آموزش کامل دریافت را ببینید؟';
+                    } else {
+                        botMsg.innerText = 'در حال حاضر می‌توانید از اعتبار ۵ میلیونی تارا استفاده کنید و آن را در ۳ قسط بدون سود بازپرداخت نمایید.';
+                    }
+                    chatBox.appendChild(botMsg);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }, 600);
+            };
+
+            window.sendMessage = function() {
+                const input = document.getElementById('chatInput');
+                if (input.value.trim()) {
+                    addUserMessage(input.value);
+                    input.value = '';
+                }
+            };
+
+            // prefill some chat
+            setTimeout(() => {
+                if (document.getElementById('tab-ai').classList.contains('active')) {
+                    // do nothing extra
+                }
+            }, 100);
+        })();
+    </script>
+
+    <!-- register service worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => console.log('SW registered')).catch(err => console.log('SW error', err));
+            });
+        }
+    </script>
 </body>
 </html>
